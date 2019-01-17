@@ -88,6 +88,13 @@ static ACCB1 ASBool ACCB2 myCosDictEnumProc(CosObj obj, CosObj value, void* clie
   return false;
 }
 
+PDPage PDDocAcquirePageFromCosObj(PDDoc pd_doc, CosObj page_obj) {
+  for (auto i = 0; i < PDDocGetNumPages(pd_doc); i++)
+    if (CosObjEqual(page_obj, PDDocGetPageObjByNum(pd_doc, i)))
+      return PDDocAcquirePage(pd_doc, i);
+  return NULL;
+}
+
 //*****************************************************************************
 ASBool FixPDSElement(PDDoc pd_doc, PDSElement element, ASBool perform_fix) {
 
@@ -108,7 +115,6 @@ ASBool FixPDSElement(PDDoc pd_doc, PDSElement element, ASBool perform_fix) {
       (void**)&marked_content,     //Pointer to the kid or NULL.
       NULL );    //The CosObj of the page containing the kid or NULL
 
-
     if (kid_type == ASAtomFromString("StructElem")) {
       if (!FixPDSElement(pd_doc, kid, perform_fix))
         return false; //canceled
@@ -117,23 +123,32 @@ ASBool FixPDSElement(PDDoc pd_doc, PDSElement element, ASBool perform_fix) {
     }
     else if (kid_type == ASAtomFromString("MC")) {
       DURING
-        PDEContent pde_content = NULL;
-        PDPage page = NULL;
         if (perform_fix) {
-          page = PDDocAcquirePage(pd_doc, 0); //rt - need to acquire the right page #
-          pde_content = PDPageAcquirePDEContent(page, 0);
-        }
+          //need to acquire content to be able to change the MC container
+          PDEContent pde_content = NULL;
+          PDPage page = PDDocAcquirePageFromCosObj(pd_doc, mcid_info.page);
+          if (page != NULL)
+            pde_content = PDPageAcquirePDEContent(page, 0);
+          else {
+            AVAlertNote("Can't find page for mcid");
+          }
 
-        PDEContainer container = PDSMCGetPDEContainer(marked_content);
-        //PDEContainerGetDict
-        ASAtom mc_tag = PDEContainerGetMCTag(container);
-
-        if (mc_tag != se_tag) {
-          if (perform_fix) {
+          PDEContainer container = PDSMCGetPDEContainer(marked_content);
+          ASAtom mc_tag = PDEContainerGetMCTag(container);
+          if (mc_tag != se_tag) {
             PDEContainerSetMCTag(container, se_tag);
             PDPageSetPDEContent(page, 0);
           }
-          else {
+
+          if (pde_content != NULL)
+            PDPageReleasePDEContent(page, 0);
+          if (page != NULL)
+            PDPageRelease(page);
+        }
+        else {
+          // just checking if the SE type matches the MC tag
+          ASAtom mc_tag = PDEContainerGetMCTag(PDSMCGetPDEContainer(marked_content));
+          if (mc_tag != se_tag) {
             char buf[1024];
             sprintf(buf, "Problem. SE: %s --> MC: %s \n Continue checking?", ASAtomGetString(se_tag), ASAtomGetString(mc_tag));
             if (AVAlert(ALERT_QUESTION, buf, "Yes", "No", NULL, true) == 2) {
@@ -142,12 +157,6 @@ ASBool FixPDSElement(PDDoc pd_doc, PDSElement element, ASBool perform_fix) {
             }
           }
         }
-
-        if (pde_content != NULL)
-          PDPageReleasePDEContent(page, 0);
-        if (page != NULL)
-          PDPageRelease(page);
-
       HANDLER
       END_HANDLER;
     }
