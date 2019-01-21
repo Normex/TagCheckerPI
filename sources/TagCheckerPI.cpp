@@ -166,6 +166,45 @@ ASBool FixPDSElement(PDDoc pd_doc, PDSElement element, ASBool perform_fix) {
 }
 
 //*****************************************************************************
+ASBool RemoveEmptyKeys(PDSElement element) {
+  // recursively going through StructElem kids
+  ASInt32 num_kids = PDSElementGetNumKids(element);
+
+  for (ASInt32 kid_index = 0; kid_index < num_kids; ++kid_index) {
+    PDSElement kid;
+
+    //Get the kid info
+    ASAtom kid_type = PDSElementGetKid(element,  //The PDSElement containing the kid that is retrieved
+      kid_index, //The index of the kid.
+      &kid,     //The kid being accessed (depending on the kid's type) or NULL.
+      NULL,     //Pointer to the kid or NULL.
+      NULL);    //The CosObj of the page containing the kid or NULL
+
+    if (kid_type == ASAtomFromString("StructElem")) {
+      DURING
+        CosObj element_cosobj = PDSElementGetCosObj(kid);
+        if (CosObjGetType(element_cosobj) == CosDict) {
+          //remove empty T key
+          if (CosDictKnown(element_cosobj, ASAtomFromString("T"))) {
+            CosObj title_obj = CosDictGet(element_cosobj, ASAtomFromString("T"));
+            if (CosObjGetType(title_obj) == CosString) {
+              ASTCount count;
+              CosStringValue(title_obj, &count);
+              if (count == 0)
+                CosDictRemove(element_cosobj, ASAtomFromString("T"));
+            }
+          }
+          //end remove empty T key
+        }
+      HANDLER
+      END_HANDLER
+      RemoveEmptyKeys(kid);
+    }
+  }
+  return true;
+}
+
+//*****************************************************************************
 ACCB1 void ACCB2 FixCommand(void *clientData) {
   PDDoc pd_doc = AVDocGetPDDoc(AVAppGetActiveDoc());
 
@@ -173,12 +212,14 @@ ACCB1 void ACCB2 FixCommand(void *clientData) {
   if (!PDDocGetStructTreeRoot(pd_doc, &pds_tree_root))
     return;
 
-  //Sync the Structure Element types with Marked content tags
   ASInt32 num = PDSTreeRootGetNumKids(pds_tree_root);
   PDSElement elem;
   for (ASInt32 i = 0; i < num; i++) {
     PDSTreeRootGetKid(pds_tree_root, i, &elem);
+    //Sync the Structure Element types with Marked content tags
     FixPDSElement(pd_doc, elem, true);
+    //remove empty keys
+    RemoveEmptyKeys(elem);
   }
 
   //remove ClassMap only if empty
