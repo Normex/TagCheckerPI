@@ -182,19 +182,32 @@ ASBool RemoveEmptyKeys(PDSElement element) {
 
     if (kid_type == ASAtomFromString("StructElem")) {
       DURING
-        CosObj element_cosobj = PDSElementGetCosObj(kid);
-        if (CosObjGetType(element_cosobj) == CosDict) {
+        CosObj kid_obj = PDSElementGetCosObj(kid);
+        if (CosObjGetType(kid_obj) == CosDict) {
+
           //remove empty T key
-          if (CosDictKnown(element_cosobj, ASAtomFromString("T"))) {
-            CosObj title_obj = CosDictGet(element_cosobj, ASAtomFromString("T"));
-            if (CosObjGetType(title_obj) == CosString) {
-              ASTCount count;
-              CosStringValue(title_obj, &count);
-              if (count == 0)
-                CosDictRemove(element_cosobj, ASAtomFromString("T"));
-            }
+          CosObj title_obj = CosDictGet(kid_obj, ASAtomFromString("T"));
+          if (!CosObjEqual(title_obj, CosNewNull())) {
+            ASTCount count;
+            CosStringValue(title_obj, &count);
+            if (count == 0)
+              CosDictRemove(kid_obj, ASAtomFromString("T"));
           }
-          //end remove empty T key
+
+          //remove empty A
+          CosObj attr_obj = CosDictGet(kid_obj, ASAtomFromString("A"));
+          if (!CosObjEqual(attr_obj, CosNewNull()))
+            if (CosObjEnum(attr_obj, myCosDictEnumProc, NULL))
+              CosDictRemove(kid_obj, ASAtomFromString("A"));
+
+          //remove empty ID
+          CosObj id_obj = CosDictGet(kid_obj, ASAtomFromString("ID"));
+          if (!CosObjEqual(id_obj, CosNewNull())) {
+            ASTCount count;
+            CosStringValue(id_obj, &count);
+            if (count == 0)
+              CosDictRemove(kid_obj, ASAtomFromString("ID"));
+          }
         }
       HANDLER
       END_HANDLER
@@ -207,7 +220,7 @@ ASBool RemoveEmptyKeys(PDSElement element) {
 //*****************************************************************************
 ACCB1 void ACCB2 FixCommand(void *clientData) {
   PDDoc pd_doc = AVDocGetPDDoc(AVAppGetActiveDoc());
-
+  
   PDSTreeRoot pds_tree_root = CosNewNull();
   if (!PDDocGetStructTreeRoot(pd_doc, &pds_tree_root))
     return;
