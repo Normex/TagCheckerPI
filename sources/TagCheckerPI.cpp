@@ -231,11 +231,27 @@ bool DoIDEntries(bool perform_fix) {
 
 //*****************************************************************************
 bool DoOutputIntents(bool perform_fix) {
+//  *Remove Output Intents entry(OutputIntents dictionary from catalog is removed if exists)
+  CosObj catalog = CosDocGetRoot(PDDocGetCosDoc(AVDocGetPDDoc(AVAppGetActiveDoc())));
+  CosObj oi = CosDictGet(catalog, ASAtomFromString("OutputIntents"));
+  if (!CosObjEqual(oi, CosNewNull()))
+    if (!perform_fix) return true;
+    else CosDictRemove(catalog, ASAtomFromString("OutputIntents"));
   return false;
 }
 
 //*****************************************************************************
 bool DoAcroform(bool perform_fix) {
+  //*Remove Acroform entry(if Fields entry in AcroFom is empty array, we remove whole AcroForm entry in catalog dictionary)
+  CosObj catalog = CosDocGetRoot(PDDocGetCosDoc(AVDocGetPDDoc(AVAppGetActiveDoc())));
+
+  CosObj acroform = CosDictGet(catalog, ASAtomFromString("AcroForm"));
+  if (!CosObjEqual(acroform, CosNewNull())) {
+    CosObj fields = CosDictGet(acroform, ASAtomFromString("Fields"));
+    if ((CosObjGetType(fields) == CosArray) && (CosArrayLength(fields) == 0))
+      if (!perform_fix) return true;
+      else CosDictRemove(catalog, ASAtomFromString("AcroForm"));
+  }
   return false;
 }
 
