@@ -2,7 +2,7 @@
 Plug-in for Adobe Acrobat. Checking and fixing pdf files for the purpose of PDF Techniques Accessibility LWG. The plug-in should address the technical problems to be avoided in all sample files created.
 
 The current implementation is able to:
-* Align Strucuture Elements with Containter types
+* Align Strucuture Elements with Container types
 * Remove empty Class Map
 * Remove empty Role Map
 * Remove empty ID Tree
