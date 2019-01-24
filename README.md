@@ -14,6 +14,7 @@ The current implementation is able to:
 * Remove redundant Lang attribute on Structure Elements
 
 ## Screenshot
+![alt text](https://github.com/Normex/TagCheckerPI/blob/master/tagchecker.png "TagChecker")
 # Licensing
 # Documentation
 # Quick Start
