@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -14,11 +14,13 @@
     <ClCompile Include="..\Headers\API\PIMain.cpp" />
     <ClCompile Include="..\sources\TagCheckerPI.cpp" />
     <ClCompile Include="..\sources\TagCheckerPIInit.cpp" />
+    <ClCompile Include="TagCheckerDlg.cpp" />
     <ClCompile Include="TagCheckerPIApp.cpp" />
     <ClCompile Include="StdAfx.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\sources\TagCheckerPI.h" />
+    <ClInclude Include="TagCheckerDlg.h" />
     <ClInclude Include="TagCheckerPIApp.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="StdAfx.h" />
@@ -69,6 +71,7 @@
     <TargetExt>.api</TargetExt>
     <OutDir>c:\Program Files (x86)\Adobe\Acrobat DC\Acrobat\plug_ins\</OutDir>
     <TargetName>$(ProjectName)d</TargetName>
+    <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Midl>
@@ -119,7 +122,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>.\;..\sources;..\Headers;..\Headers\SDK;..\Headers\API;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <BrowseInformation>true</BrowseInformation>

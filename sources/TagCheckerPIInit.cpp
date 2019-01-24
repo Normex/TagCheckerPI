@@ -2,15 +2,31 @@
 
 #ifndef MAC_PLATFORM
 #include "PIHeaders.h"
+#include "TagCheckerDlg.h"
 #endif
 
+static AVMenuItem menu_item = NULL;
 
-// callback functions implemented in file "BasicPlugin.cpp"
-//extern ACCB1 void ACCB2 MyPluginCommand(void *clientData);
-//extern ACCB1 ASBool ACCB2 MyPluginIsEnabled(void *clientData);
-extern ACCB1 ASBool ACCB2 MyPluginSetmenu();
-extern ACCB1 ASBool ACCB2 MyPluginUnload();
+ACCB1 ASBool ACCB2 IsFileOpen(void *clientData);
+ACCB1 void ACCB2 TagCheckerCommand(void *clientData);
 
+
+//*****************************************************************************
+ACCB1 ASBool ACCB2 IsFileOpen(void *clientData) {
+  return (AVAppGetActiveDoc() != NULL);
+}
+
+//*****************************************************************************
+ACCB1 void ACCB2 TagCheckerCommand(void *clientData) {
+
+#ifdef MAC_PLATFORM
+  not implemented
+#else
+  CTagCheckerDlg dlg;
+  dlg.DoModal();
+#endif
+
+}
 
 /*-------------------------------------------------------
 	Core Handshake Callbacks
@@ -55,7 +71,23 @@ ACCB1 ASBool ACCB2 PluginImportReplaceAndRegister(void)
 */
 ACCB1 ASBool ACCB2 PluginInit(void)
 {
-	return MyPluginSetmenu();
+  AVMenubar menubar = AVAppGetMenubar();
+  if (!menubar)
+    return false;
+
+  auto parent_menu = AVMenubarAcquireMenuByName(menubar, "Extensions");
+
+  DURING
+    // Create our menuitem
+    menu_item = AVMenuItemNew("Tag Checker", "NORM:TagChecker_AccessibilityLWG:TagChecker", NULL, true, NO_SHORTCUT, 0, NULL, gExtensionID);
+  AVMenuItemSetExecuteProc(menu_item, ASCallbackCreateProto(AVExecuteProc, TagCheckerCommand), NULL);
+  AVMenuItemSetComputeEnabledProc(menu_item, ASCallbackCreateProto(AVComputeEnabledProc, IsFileOpen), (void *)pdPermEdit);
+
+  AVMenuAddMenuItem(parent_menu, menu_item, APPEND_MENUITEM);
+  HANDLER
+    END_HANDLER
+
+    return true;
 }
 
 /** 
@@ -69,7 +101,9 @@ ACCB1 ASBool ACCB2 PluginInit(void)
 */
 ACCB1 ASBool ACCB2 PluginUnload(void)
 {
-  return MyPluginUnload();
+  if (menu_item)
+    AVMenuItemRemove(menu_item);
+  return true;
 }
 
 /**
@@ -134,19 +168,3 @@ ACCB1 ASBool ACCB2 PIHandshake(Uns32 handshakeVersion, void *handshakeData)
 	return false;
 }
 
-/*-------------------------------------------------------
-	Menu Utility
--------------------------------------------------------*/
-
-/**
-	A convenient function to add a menu item under Acrobat SDK menu.
-	@param MyMenuItemTitle IN String for the menu item's title.
-	@param MyMenuItemName IN String for the menu item's internal name.
-	@return true if successful, false if failed.
-	@see AVAppGetMenubar
-	@see AVMenuItemNew
-	@see AVMenuItemSetExecuteProc
-	@see AVMenuItemSetComputeEnabledProc
-	@see AVMenubarAcquireMenuItemByName
-	@see AVMenubarAcquireMenuByName
-*/
