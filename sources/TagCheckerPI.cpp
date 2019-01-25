@@ -164,18 +164,16 @@ bool DoIDTree(bool perform_fix) {
 
 //*****************************************************************************
 bool DoAttributes(bool perform_fix) {
-  ProcessStructureElementFunction attributes = [](bool perform_fix, PDSElement element, 
+  ProcessStructureElementFunction attributes = [](bool perform_fix, PDSElement element,
     ASAtom kid_type, PDSElement kid, PDSMCInfo mcid_info, PDSMC marked_content) {
-    if (kid_type == ASAtomFromString("StructElem")) {
-      CosObj kid_obj = PDSElementGetCosObj(kid);
-      if (CosObjGetType(kid_obj) == CosDict) {
-        //remove empty Attributes
-        CosObj attr_obj = CosDictGet(kid_obj, ASAtomFromString("A"));
-        if (!CosObjEqual(attr_obj, CosNewNull()))
-          if (CosObjEnum(attr_obj, myCosDictEnumProc, NULL))
-            if (!perform_fix) return true;
-            else CosDictRemove(kid_obj, ASAtomFromString("A"));
-      }
+    CosObj element_obj = PDSElementGetCosObj(element);
+    if (CosObjGetType(element_obj) == CosDict) {
+      //remove empty Attributes
+      CosObj attr_obj = CosDictGet(element_obj, ASAtomFromString("A"));
+      if (!CosObjEqual(attr_obj, CosNewNull()))
+        if (CosObjEnum(attr_obj, myCosDictEnumProc, NULL))
+          if (!perform_fix) return true;
+          else CosDictRemove(element_obj, ASAtomFromString("A"));
     }
     return false;
   };
@@ -185,22 +183,20 @@ bool DoAttributes(bool perform_fix) {
 //*****************************************************************************
 bool DoTitleEntries(bool perform_fix) {
   ProcessStructureElementFunction titleEntries = [](bool perform_fix, PDSElement element,
-    ASAtom kid_type, PDSElement kid, PDSMCInfo mcid_info,PDSMC marked_content) {
-    if (kid_type == ASAtomFromString("StructElem")) {
-      CosObj kid_obj = PDSElementGetCosObj(kid);
-      if (CosObjGetType(kid_obj) == CosDict) {
-        //remove empty T key
-        CosObj title_obj = CosDictGet(kid_obj, ASAtomFromString("T"));
-        if (!CosObjEqual(title_obj, CosNewNull())) {
-          ASTCount count;
-          CosStringValue(title_obj, &count);
-          if (count == 0)
-            if (!perform_fix) return true;
-            else CosDictRemove(kid_obj, ASAtomFromString("T"));
-        }
+    ASAtom kid_type, PDSElement kid, PDSMCInfo mcid_info, PDSMC marked_content) {
+    CosObj element_obj = PDSElementGetCosObj(element);
+    if (CosObjGetType(element_obj) == CosDict) {
+      //remove empty T key
+      CosObj title_obj = CosDictGet(element_obj, ASAtomFromString("T"));
+      if (!CosObjEqual(title_obj, CosNewNull())) {
+        ASTCount count;
+        CosStringValue(title_obj, &count);
+        if (count == 0)
+          if (!perform_fix) return true;
+          else CosDictRemove(element_obj, ASAtomFromString("T"));
       }
     }
-    return false; 
+    return false;
   };
 
   return DoStructureElement(perform_fix, titleEntries);
@@ -208,22 +204,21 @@ bool DoTitleEntries(bool perform_fix) {
 
 //*****************************************************************************
 bool DoIDEntries(bool perform_fix) {
-  ProcessStructureElementFunction ids = [](bool perform_fix, PDSElement element, 
+  ProcessStructureElementFunction ids = [](bool perform_fix, PDSElement element,
     ASAtom kid_type, PDSElement kid, PDSMCInfo mcid_info, PDSMC marked_content) {
-    if (kid_type == ASAtomFromString("StructElem")) {
-      CosObj kid_obj = PDSElementGetCosObj(kid);
-      if (CosObjGetType(kid_obj) == CosDict) {
-        //remove empty ID
-        CosObj id_obj = CosDictGet(kid_obj, ASAtomFromString("ID"));
-        if (!CosObjEqual(id_obj, CosNewNull())) {
-          ASTCount count;
-          CosStringValue(id_obj, &count);
-          if (count == 0)
-            if (!perform_fix) return true;
-            else CosDictRemove(kid_obj, ASAtomFromString("ID"));
-        }
+    CosObj element_obj = PDSElementGetCosObj(element);
+    if (CosObjGetType(element_obj) == CosDict) {
+      //remove empty ID
+      CosObj id_obj = CosDictGet(element_obj, ASAtomFromString("ID"));
+      if (!CosObjEqual(id_obj, CosNewNull())) {
+        ASTCount count;
+        CosStringValue(id_obj, &count);
+        if (count == 0)
+          if (!perform_fix) return true;
+          else CosDictRemove(element_obj, ASAtomFromString("ID"));
       }
     }
+
     return false;
   };
   return DoStructureElement(perform_fix, ids);
