@@ -10,7 +10,7 @@
 typedef std::function< bool(bool perform_fix, 
                             PDSElement element,
                             ASAtom kid_type, 
-                            PDSElement kid, 
+                            CosObj kid, 
                             PDSMCInfo mcid_info,
                             PDSMC marked_content)> ProcessStructureElementFunction;
 
@@ -31,7 +31,7 @@ bool DoStructureElement(PDDoc pd_doc, PDSElement element, bool perform_fix, Proc
 
   bool to_ret = false;
   for (ASInt32 kid_index = 0; kid_index < num_kids; ++kid_index) {
-    PDSElement kid;
+    CosObj kid;
     PDSMCInfo mcid_info;
     PDSMC marked_content;
 
@@ -44,7 +44,7 @@ bool DoStructureElement(PDDoc pd_doc, PDSElement element, bool perform_fix, Proc
       NULL);    //The CosObj of the page containing the kid or NULL
 
     // calls callback that performs the check or the fix
-    if (callback(perform_fix, element, kid_type,kid,mcid_info,marked_content))
+    if (callback(perform_fix, element, kid_type, kid,mcid_info, marked_content))
       return true;
 
     if (kid_type == ASAtomFromString("StructElem")) {
@@ -84,7 +84,7 @@ PDPage PDDocAcquirePageFromCosObj(PDDoc pd_doc, CosObj page_obj) {
 //*****************************************************************************
 bool DoAllignSEWithMC(bool perform_fix) {
   ProcessStructureElementFunction sync_se_and_mc = [](bool perform_fix, PDSElement element,
-    ASAtom kid_type, PDSElement kid, PDSMCInfo mcid_info, PDSMC marked_content) {
+    ASAtom kid_type, CosObj kid, PDSMCInfo mcid_info, PDSMC marked_content) {
 
     if (kid_type != ASAtomFromString("MC")) return false;
     if (perform_fix) {
@@ -165,7 +165,7 @@ bool DoIDTree(bool perform_fix) {
 //*****************************************************************************
 bool DoAttributes(bool perform_fix) {
   ProcessStructureElementFunction attributes = [](bool perform_fix, PDSElement element, 
-    ASAtom kid_type, PDSElement kid, PDSMCInfo mcid_info, PDSMC marked_content) {
+    ASAtom kid_type, CosObj kid, PDSMCInfo mcid_info, PDSMC marked_content) {
     if (kid_type == ASAtomFromString("StructElem")) {
       CosObj kid_obj = PDSElementGetCosObj(kid);
       if (CosObjGetType(kid_obj) == CosDict) {
@@ -185,7 +185,7 @@ bool DoAttributes(bool perform_fix) {
 //*****************************************************************************
 bool DoTitleEntries(bool perform_fix) {
   ProcessStructureElementFunction titleEntries = [](bool perform_fix, PDSElement element,
-    ASAtom kid_type, PDSElement kid, PDSMCInfo mcid_info,PDSMC marked_content) {
+    ASAtom kid_type, CosObj kid, PDSMCInfo mcid_info,PDSMC marked_content) {
     if (kid_type == ASAtomFromString("StructElem")) {
       CosObj kid_obj = PDSElementGetCosObj(kid);
       if (CosObjGetType(kid_obj) == CosDict) {
@@ -209,7 +209,7 @@ bool DoTitleEntries(bool perform_fix) {
 //*****************************************************************************
 bool DoIDEntries(bool perform_fix) {
   ProcessStructureElementFunction ids = [](bool perform_fix, PDSElement element, 
-    ASAtom kid_type, PDSElement kid, PDSMCInfo mcid_info, PDSMC marked_content) {
+    ASAtom kid_type, CosObj kid, PDSMCInfo mcid_info, PDSMC marked_content) {
     if (kid_type == ASAtomFromString("StructElem")) {
       CosObj kid_obj = PDSElementGetCosObj(kid);
       if (CosObjGetType(kid_obj) == CosDict) {
