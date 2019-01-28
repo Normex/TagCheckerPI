@@ -116,7 +116,7 @@ bool DoAllignSEWithMC(bool perform_fix) {
       //char buf[1024];
       //sprintf(buf, "Problem. SE: %s --> MC: %s ", ASAtomGetString(PDSElementGetType(element)), ASAtomGetString(mc_tag));
       if (mc_tag != PDSElementGetType(element))
-        return true;
+        return true; //stop processing the tree
     }
     return false;
   };
@@ -136,7 +136,7 @@ bool DoClassMap(bool perform_fix) {
   if (PDSTreeRootGetClassMap(pds_tree_root, &class_map))
     if (!CosObjEqual(class_map, CosNewNull()))
       if (CosObjEnum(class_map, myCosDictEnumProc, NULL))
-        if (!perform_fix) return true;
+        if (!perform_fix) return true; //stop processing the tree
         else PDSTreeRootRemoveClassMap(pds_tree_root);
   return false;
 }
@@ -152,7 +152,7 @@ bool DoRoleMap(bool perform_fix) {
   if (PDSTreeRootGetRoleMap(pds_tree_root, &role_map))
     if (!CosObjEqual(role_map, CosNewNull()))
       if (CosObjEnum(role_map, myCosDictEnumProc, NULL))
-        if (!perform_fix) return true;
+        if (!perform_fix) return true; //stop processing the tree
         else PDSTreeRootRemoveRoleMap(pds_tree_root);
   return false;
 }
@@ -164,19 +164,18 @@ bool DoIDTree(bool perform_fix) {
 
 //*****************************************************************************
 bool DoAttributes(bool perform_fix) {
-  ProcessStructureElementFunction attributes = [](bool perform_fix, PDSElement element, 
-    ASAtom kid_type, CosObj kid, PDSMCInfo mcid_info, PDSMC marked_content) {
-    if (kid_type == ASAtomFromString("StructElem")) {
-      CosObj kid_obj = PDSElementGetCosObj(kid);
-      if (CosObjGetType(kid_obj) == CosDict) {
-        //remove empty Attributes
-        CosObj attr_obj = CosDictGet(kid_obj, ASAtomFromString("A"));
-        if (!CosObjEqual(attr_obj, CosNewNull()))
-          if (CosObjEnum(attr_obj, myCosDictEnumProc, NULL))
-            if (!perform_fix) return true;
-            else CosDictRemove(kid_obj, ASAtomFromString("A"));
-      }
-    }
+  ProcessStructureElementFunction attributes = [](bool perform_fix, PDSElement element,
+    ASAtom kid_type, CosObj kid, PDSMCInfo mcid_info, PDSMC marked_content)
+  {
+    CosObj element_obj = PDSElementGetCosObj(element);
+    CosObj attr_obj = CosDictGet(element_obj, ASAtomFromString("A"));
+    if (CosObjEqual(attr_obj, CosNewNull()))
+      return false;
+
+    if (CosObjEnum(attr_obj, myCosDictEnumProc, NULL))
+      if (!perform_fix) return true; //stop processing the tree
+      else CosDictRemove(element_obj, ASAtomFromString("A"));
+
     return false;
   };
   return DoStructureElement(perform_fix, attributes);
@@ -185,45 +184,40 @@ bool DoAttributes(bool perform_fix) {
 //*****************************************************************************
 bool DoTitleEntries(bool perform_fix) {
   ProcessStructureElementFunction titleEntries = [](bool perform_fix, PDSElement element,
-    ASAtom kid_type, CosObj kid, PDSMCInfo mcid_info,PDSMC marked_content) {
-    if (kid_type == ASAtomFromString("StructElem")) {
-      CosObj kid_obj = PDSElementGetCosObj(kid);
-      if (CosObjGetType(kid_obj) == CosDict) {
-        //remove empty T key
-        CosObj title_obj = CosDictGet(kid_obj, ASAtomFromString("T"));
-        if (!CosObjEqual(title_obj, CosNewNull())) {
-          ASTCount count;
-          CosStringValue(title_obj, &count);
-          if (count == 0)
-            if (!perform_fix) return true;
-            else CosDictRemove(kid_obj, ASAtomFromString("T"));
-        }
-      }
-    }
-    return false; 
-  };
+    ASAtom kid_type, CosObj kid, PDSMCInfo mcid_info, PDSMC marked_content)
+  {
+    CosObj element_obj = PDSElementGetCosObj(element);
+    CosObj title_obj = CosDictGet(element_obj, ASAtomFromString("T"));
+    if (CosObjEqual(title_obj, CosNewNull()))
+      return false;
 
+    ASTCount count;
+    CosStringValue(title_obj, &count);
+    if (count == 0)
+      if (!perform_fix) return true; //stop processing the tree
+      else CosDictRemove(element_obj, ASAtomFromString("T"));
+
+    return false;
+  };
   return DoStructureElement(perform_fix, titleEntries);
 }
 
 //*****************************************************************************
 bool DoIDEntries(bool perform_fix) {
   ProcessStructureElementFunction ids = [](bool perform_fix, PDSElement element, 
-    ASAtom kid_type, CosObj kid, PDSMCInfo mcid_info, PDSMC marked_content) {
-    if (kid_type == ASAtomFromString("StructElem")) {
-      CosObj kid_obj = PDSElementGetCosObj(kid);
-      if (CosObjGetType(kid_obj) == CosDict) {
-        //remove empty ID
-        CosObj id_obj = CosDictGet(kid_obj, ASAtomFromString("ID"));
-        if (!CosObjEqual(id_obj, CosNewNull())) {
-          ASTCount count;
-          CosStringValue(id_obj, &count);
-          if (count == 0)
-            if (!perform_fix) return true;
-            else CosDictRemove(kid_obj, ASAtomFromString("ID"));
-        }
-      }
-    }
+    ASAtom kid_type, CosObj kid, PDSMCInfo mcid_info, PDSMC marked_content)
+  {
+    CosObj element_obj = PDSElementGetCosObj(element);
+    CosObj id_obj = CosDictGet(element_obj, ASAtomFromString("ID"));
+    if (CosObjEqual(id_obj, CosNewNull()))
+      return false;
+
+    ASTCount count;
+    CosStringValue(id_obj, &count);
+    if (count == 0)
+      if (!perform_fix) return true; //stop processing the tree
+      else CosDictRemove(element_obj, ASAtomFromString("ID"));
+
     return false;
   };
   return DoStructureElement(perform_fix, ids);
@@ -235,7 +229,7 @@ bool DoOutputIntents(bool perform_fix) {
   CosObj catalog = CosDocGetRoot(PDDocGetCosDoc(AVDocGetPDDoc(AVAppGetActiveDoc())));
   CosObj oi = CosDictGet(catalog, ASAtomFromString("OutputIntents"));
   if (!CosObjEqual(oi, CosNewNull()))
-    if (!perform_fix) return true;
+    if (!perform_fix) return true; //stop processing the tree
     else CosDictRemove(catalog, ASAtomFromString("OutputIntents"));
   return false;
 }
@@ -249,7 +243,7 @@ bool DoAcroform(bool perform_fix) {
   if (!CosObjEqual(acroform, CosNewNull())) {
     CosObj fields = CosDictGet(acroform, ASAtomFromString("Fields"));
     if ((CosObjGetType(fields) == CosArray) && (CosArrayLength(fields) == 0))
-      if (!perform_fix) return true;
+      if (!perform_fix) return true; //stop processing the tree
       else CosDictRemove(catalog, ASAtomFromString("AcroForm"));
   }
   return false;
