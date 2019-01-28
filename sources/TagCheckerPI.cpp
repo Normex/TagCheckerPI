@@ -131,29 +131,35 @@ bool DoClassMap(bool perform_fix) {
   PDSTreeRoot pds_tree_root = CosNewNull();
   if (!PDDocGetStructTreeRoot(pd_doc, &pds_tree_root))
     return false;
-
   PDSClassMap class_map;
-  if (PDSTreeRootGetClassMap(pds_tree_root, &class_map))
-    if (!CosObjEqual(class_map, CosNewNull()))
-      if (CosObjEnum(class_map, myCosDictEnumProc, NULL))
-        if (!perform_fix) return true; //stop processing the tree
-        else PDSTreeRootRemoveClassMap(pds_tree_root);
+  if (!PDSTreeRootGetClassMap(pds_tree_root, &class_map))
+    return false;
+  if (CosObjEqual(class_map, CosNewNull()))
+    return false;
+
+  if (CosObjEnum(class_map, myCosDictEnumProc, NULL))
+    if (!perform_fix) return true; //stop processing the tree
+    else PDSTreeRootRemoveClassMap(pds_tree_root);
+
   return false;
 }
 
 //*****************************************************************************
 bool DoRoleMap(bool perform_fix) {
   PDDoc pd_doc = AVDocGetPDDoc(AVAppGetActiveDoc());
-
   PDSTreeRoot pds_tree_root = CosNewNull();
-  if (!PDDocGetStructTreeRoot(pd_doc, &pds_tree_root))  return false;
-
+  if (!PDDocGetStructTreeRoot(pd_doc, &pds_tree_root))
+    return false;
   PDSRoleMap role_map;
-  if (PDSTreeRootGetRoleMap(pds_tree_root, &role_map))
-    if (!CosObjEqual(role_map, CosNewNull()))
-      if (CosObjEnum(role_map, myCosDictEnumProc, NULL))
-        if (!perform_fix) return true; //stop processing the tree
-        else PDSTreeRootRemoveRoleMap(pds_tree_root);
+  if (!PDSTreeRootGetRoleMap(pds_tree_root, &role_map))
+    return false;
+  if (CosObjEqual(role_map, CosNewNull()))
+    return false;
+
+  if (CosObjEnum(role_map, myCosDictEnumProc, NULL))
+    if (!perform_fix) return true; //stop processing the tree
+    else PDSTreeRootRemoveRoleMap(pds_tree_root);
+
   return false;
 }
 
@@ -225,12 +231,15 @@ bool DoIDEntries(bool perform_fix) {
 
 //*****************************************************************************
 bool DoOutputIntents(bool perform_fix) {
-//  *Remove Output Intents entry(OutputIntents dictionary from catalog is removed if exists)
+  //*Remove Output Intents entry (OutputIntents dictionary from catalog is removed if exists)
   CosObj catalog = CosDocGetRoot(PDDocGetCosDoc(AVDocGetPDDoc(AVAppGetActiveDoc())));
   CosObj oi = CosDictGet(catalog, ASAtomFromString("OutputIntents"));
-  if (!CosObjEqual(oi, CosNewNull()))
-    if (!perform_fix) return true; //stop processing the tree
-    else CosDictRemove(catalog, ASAtomFromString("OutputIntents"));
+  if (CosObjEqual(oi, CosNewNull()))
+    return false;
+
+  if (!perform_fix) return true; //stop processing the tree
+  else CosDictRemove(catalog, ASAtomFromString("OutputIntents"));
+
   return false;
 }
 
@@ -240,12 +249,15 @@ bool DoAcroform(bool perform_fix) {
   CosObj catalog = CosDocGetRoot(PDDocGetCosDoc(AVDocGetPDDoc(AVAppGetActiveDoc())));
 
   CosObj acroform = CosDictGet(catalog, ASAtomFromString("AcroForm"));
-  if (!CosObjEqual(acroform, CosNewNull())) {
-    CosObj fields = CosDictGet(acroform, ASAtomFromString("Fields"));
-    if ((CosObjGetType(fields) == CosArray) && (CosArrayLength(fields) == 0))
-      if (!perform_fix) return true; //stop processing the tree
-      else CosDictRemove(catalog, ASAtomFromString("AcroForm"));
-  }
+  if (CosObjEqual(acroform, CosNewNull()))
+    return false;
+
+  CosObj fields = CosDictGet(acroform, ASAtomFromString("Fields"));
+  if ((CosObjEnum(acroform, myCosDictEnumProc, NULL)) ||
+      (CosObjGetType(fields) == CosArray) && (CosArrayLength(fields) == 0))
+    if (!perform_fix) return true; //stop processing the tree
+    else CosDictRemove(catalog, ASAtomFromString("AcroForm"));
+
   return false;
 }
 
