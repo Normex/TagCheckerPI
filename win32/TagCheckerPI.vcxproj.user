@@ -4,4 +4,7 @@
     <LocalDebuggerCommand>C:\Program Files %28x86%29\Adobe\Acrobat DC\Acrobat\Acrobat.exe</LocalDebuggerCommand>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
+  <PropertyGroup>
+    <RESOURCE_FILE>TagCheckerPI.rc</RESOURCE_FILE>
+  </PropertyGroup>
 </Project>

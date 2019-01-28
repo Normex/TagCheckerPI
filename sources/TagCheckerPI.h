@@ -17,6 +17,10 @@ bool DoTitleEntries(bool perform_fix = false);
 bool DoIDEntries(bool perform_fix = false);
 bool DoOutputIntents(bool perform_fix = false);
 bool DoAcroform(bool perform_fix = false);
+bool DoOutlines(bool perform_fix = false);
+bool DoExtensions(bool perform_fix = false);
+bool DoPageLayout(bool perform_fix = false);
 bool DoRedundantLangAttribute(bool perform_fix = false);
+bool DoActualTextNullTerminator(bool perform_fix = false);
 
 #endif

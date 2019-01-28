@@ -165,6 +165,21 @@ bool DoRoleMap(bool perform_fix) {
 
 //*****************************************************************************
 bool DoIDTree(bool perform_fix) {
+  PDDoc pd_doc = AVDocGetPDDoc(AVAppGetActiveDoc());
+
+  PDSTreeRoot pds_tree_root = CosNewNull();
+  if (!PDDocGetStructTreeRoot(pd_doc, &pds_tree_root))
+    return false;
+  CosObj idtree_obj = CosDictGet(pds_tree_root, ASAtomFromString("IDTree"));
+  if (CosObjEqual(idtree_obj, CosNewNull()))
+    return false;
+
+  CosObj names = CosDictGet(idtree_obj, ASAtomFromString("Names"));
+  if ((CosObjEnum(idtree_obj, myCosDictEnumProc, NULL)) ||
+      (CosObjGetType(names) == CosArray) && (CosArrayLength(names) == 0))
+    if (!perform_fix) return true; //stop processing the tree
+    else CosDictRemove(pds_tree_root, ASAtomFromString("IDTree"));
+
   return false;
 }
 
@@ -247,7 +262,6 @@ bool DoOutputIntents(bool perform_fix) {
 bool DoAcroform(bool perform_fix) {
   //*Remove Acroform entry(if Fields entry in AcroFom is empty array, we remove whole AcroForm entry in catalog dictionary)
   CosObj catalog = CosDocGetRoot(PDDocGetCosDoc(AVDocGetPDDoc(AVAppGetActiveDoc())));
-
   CosObj acroform = CosDictGet(catalog, ASAtomFromString("AcroForm"));
   if (CosObjEqual(acroform, CosNewNull()))
     return false;
@@ -262,6 +276,101 @@ bool DoAcroform(bool perform_fix) {
 }
 
 //*****************************************************************************
-bool DoRedundantLangAttribute(bool perform_fix) {
+bool DoOutlines(bool perform_fix) {
+  //*Remove Outlines entry(if Count entry in Outlines is 0, we remove whole Outlines entry in catalog dictionary)
+  CosObj catalog = CosDocGetRoot(PDDocGetCosDoc(AVDocGetPDDoc(AVAppGetActiveDoc())));
+  CosObj outlines = CosDictGet(catalog, ASAtomFromString("Outlines"));
+  if (CosObjEqual(outlines, CosNewNull()))
+    return false;
+
+  CosObj count = CosDictGet(outlines, ASAtomFromString("Count"));
+  if ((CosObjEnum(outlines, myCosDictEnumProc, NULL)) ||
+    (CosObjGetType(count) == CosInteger) && (CosIntegerValue(count) == 0))
+    if (!perform_fix) return true; //stop processing the tree
+    else CosDictRemove(catalog, ASAtomFromString("Outlines"));
+
   return false;
+}
+
+//*****************************************************************************
+bool DoExtensions(bool perform_fix) {
+  //*Remove Extensions entry if empty
+  CosObj catalog = CosDocGetRoot(PDDocGetCosDoc(AVDocGetPDDoc(AVAppGetActiveDoc())));
+  CosObj extensions = CosDictGet(catalog, ASAtomFromString("Extensions"));
+  if (CosObjEqual(extensions, CosNewNull()))
+    return false;
+
+  if (CosObjEnum(extensions, myCosDictEnumProc, NULL))
+    if (!perform_fix) return true; //stop processing the tree
+    else CosDictRemove(catalog, ASAtomFromString("Extensions"));
+
+  return false;
+}
+
+//*****************************************************************************
+bool DoPageLayout(bool perform_fix) {
+  //*Remove PageLayout entry if empty
+  CosObj catalog = CosDocGetRoot(PDDocGetCosDoc(AVDocGetPDDoc(AVAppGetActiveDoc())));
+  CosObj pageLayout = CosDictGet(catalog, ASAtomFromString("PageLayout"));
+  if (CosObjEqual(pageLayout, CosNewNull()))
+    return false;
+
+  ASAtom layout_name = CosNameValue(pageLayout);
+  if (ASAtomFromString("") == layout_name)
+    if (!perform_fix) return true; //stop processing the tree
+    else CosDictRemove(catalog, ASAtomFromString("PageLayout"));
+
+  return false;
+}
+
+//*****************************************************************************
+bool DoRedundantLangAttribute(bool perform_fix) {
+  ProcessStructureElementFunction ids = [](bool perform_fix, PDSElement element,
+    ASAtom kid_type, PDSElement kid, PDSMCInfo mcid_info, PDSMC marked_content)
+  {
+    CosObj catalog = CosDocGetRoot(PDDocGetCosDoc(AVDocGetPDDoc(AVAppGetActiveDoc())));
+    CosObj catalog_lang = CosDictGet(catalog, ASAtomFromString("Lang"));
+
+    if (CosObjEqual(catalog_lang, CosNewNull()))
+      return false;
+
+    ASTCount catalog_lang_count = 0;
+    char* catalog_lang_str = CosStringValue(catalog_lang, &catalog_lang_count);
+    if (catalog_lang_count <= 0)
+      return false;
+
+    CosObj element_obj = PDSElementGetCosObj(element);
+    CosObj element_lang = CosDictGet(element_obj, ASAtomFromString("Lang"));
+    if (CosObjEqual(element_lang, CosNewNull()))
+      return false;
+
+    ASTCount element_lang_count = 0;
+    char* element_lang_str = CosStringValue(element_lang, &element_lang_count);
+    if (element_lang_count > 0)
+      if (stricmp(element_lang_str, catalog_lang_str) == 0)
+        if (!perform_fix) return true; //stop processing the tree
+        else CosDictRemove(element_obj, ASAtomFromString("Lang"));
+
+    return false;
+  };
+  return DoStructureElement(perform_fix, ids);
+}
+
+bool DoActualTextNullTerminator(bool perform_fix) {
+  ProcessStructureElementFunction actuals = [](bool perform_fix, PDSElement element,
+    ASAtom kid_type, PDSElement kid, PDSMCInfo mcid_info, PDSMC marked_content)
+  {
+    ASInt32 len = PDSElementGetActualText(element, NULL);
+    if (len <= 0)
+      return false;
+
+    ASUns8* actual_text = (ASUns8*)ASmalloc(len);
+    PDSElementGetActualText(element, actual_text);
+    if (actual_text[len - 1] == '\0')
+      if (!perform_fix) return true; //stop processing the tree
+      else PDSElementSetActualText(element, actual_text, len - 1);
+    ASfree(actual_text);
+    return false;
+  };
+  return DoStructureElement(perform_fix, actuals);
 }

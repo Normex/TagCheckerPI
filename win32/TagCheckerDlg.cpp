@@ -6,6 +6,15 @@
 #include "TagCheckerDlg.h"
 #include "afxdialogex.h"
 
+const UINT fixIds[] =
+{
+  IDC_CHECK_FIX_1_1,  IDC_CHECK_FIX_2_1,  IDC_CHECK_FIX_2_2,
+  IDC_CHECK_FIX_2_3,  IDC_CHECK_FIX_2_4,  IDC_CHECK_FIX_2_5,
+  IDC_CHECK_FIX_2_6,  IDC_CHECK_FIX_2_7,  IDC_CHECK_FIX_2_8,
+  IDC_CHECK_FIX_2_9,  IDC_CHECK_FIX_2_10, IDC_CHECK_FIX_2_11,
+  IDC_CHECK_FIX_2_12, IDC_CHECK_FIX_1_2,
+  0
+};
 
 // CTagCheckerDlg dialog
 
@@ -29,6 +38,7 @@ void CTagCheckerDlg::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CTagCheckerDlg, CDialogEx)
   ON_WM_ACTIVATE()
   ON_BN_CLICKED(IDOK, &CTagCheckerDlg::OnBnClickedOk)
+  ON_CONTROL_RANGE(BN_CLICKED, IDC_CHECK_FIX_1_1, IDC_CHECK_FIX_1_2, &CTagCheckerDlg::OnCheckFix)
 END_MESSAGE_MAP()
 
 
@@ -38,9 +48,33 @@ void CTagCheckerDlg::OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized)
   CDialogEx::OnActivate(nState, pWndOther, bMinimized);
 }
 
+void CTagCheckerDlg::OnCheckFix(UINT nID)
+{
+  bool isFixId = false;
+  for (const UINT* p = fixIds; *p; ++p)
+    if (nID == *p)
+    {
+      isFixId = true;
+      break;
+    }
+
+  if (!isFixId)
+    return;
+
+  mOKBtn->EnableWindow(FALSE);
+  for (const UINT* p = fixIds; *p; ++p)
+  {
+    if (IsDlgButtonChecked(*p)) {
+      mOKBtn->EnableWindow(TRUE);
+      return;
+    }
+  }
+}
+
 void CTagCheckerDlg::OnBnClickedOk()
 {
   DoAllignSEWithMC(IsDlgButtonChecked(IDC_CHECK_FIX_1_1) == BST_CHECKED);
+  DoActualTextNullTerminator(IsDlgButtonChecked(IDC_CHECK_FIX_1_2) == BST_CHECKED);
 
   DoClassMap(IsDlgButtonChecked(IDC_CHECK_FIX_2_1) == BST_CHECKED);
   DoRoleMap(IsDlgButtonChecked(IDC_CHECK_FIX_2_2) == BST_CHECKED);
@@ -51,16 +85,22 @@ void CTagCheckerDlg::OnBnClickedOk()
   DoOutputIntents(IsDlgButtonChecked(IDC_CHECK_FIX_2_7) == BST_CHECKED);
   DoAcroform(IsDlgButtonChecked(IDC_CHECK_FIX_2_8) == BST_CHECKED);
   DoRedundantLangAttribute(IsDlgButtonChecked(IDC_CHECK_FIX_2_9) == BST_CHECKED);
+  DoOutlines(IsDlgButtonChecked(IDC_CHECK_FIX_2_10) == BST_CHECKED);
+  DoExtensions(IsDlgButtonChecked(IDC_CHECK_FIX_2_11) == BST_CHECKED);
+  DoPageLayout(IsDlgButtonChecked(IDC_CHECK_FIX_2_12) == BST_CHECKED);
+  
   CDialogEx::OnOK();
 }
-
 
 BOOL CTagCheckerDlg::OnInitDialog()
 {
   CDialogEx::OnInitDialog();
 
-  CheckDlgButton(IDC_CHECK_FOUND_1_1, DoAllignSEWithMC());
+  mOKBtn = (CButton*)GetDlgItem(IDOK);
+  mOKBtn->EnableWindow(FALSE);
 
+  CheckDlgButton(IDC_CHECK_FOUND_1_1, DoAllignSEWithMC());
+  CheckDlgButton(IDC_CHECK_FOUND_1_2, DoActualTextNullTerminator());
   CheckDlgButton(IDC_CHECK_FOUND_2_1, DoClassMap());
   CheckDlgButton(IDC_CHECK_FOUND_2_2, DoRoleMap());
   CheckDlgButton(IDC_CHECK_FOUND_2_3, DoIDTree());
@@ -70,6 +110,38 @@ BOOL CTagCheckerDlg::OnInitDialog()
   CheckDlgButton(IDC_CHECK_FOUND_2_7, DoOutputIntents());
   CheckDlgButton(IDC_CHECK_FOUND_2_8, DoAcroform());
   CheckDlgButton(IDC_CHECK_FOUND_2_9, DoRedundantLangAttribute());
+  CheckDlgButton(IDC_CHECK_FOUND_2_10, DoOutlines());
+  CheckDlgButton(IDC_CHECK_FOUND_2_11, DoExtensions());
+  CheckDlgButton(IDC_CHECK_FOUND_2_12, DoPageLayout());
+
+  CButton* pBtn = (CButton*)GetDlgItem(IDC_CHECK_FIX_1_1);
+  pBtn->EnableWindow(IsDlgButtonChecked(IDC_CHECK_FOUND_1_1));
+  pBtn = (CButton*)GetDlgItem(IDC_CHECK_FIX_1_2);
+  pBtn->EnableWindow(IsDlgButtonChecked(IDC_CHECK_FOUND_1_2));
+  pBtn = (CButton*)GetDlgItem(IDC_CHECK_FIX_2_1);
+  pBtn->EnableWindow(IsDlgButtonChecked(IDC_CHECK_FOUND_2_1));
+  pBtn = (CButton*)GetDlgItem(IDC_CHECK_FIX_2_2);
+  pBtn->EnableWindow(IsDlgButtonChecked(IDC_CHECK_FOUND_2_2));
+  pBtn = (CButton*)GetDlgItem(IDC_CHECK_FIX_2_3);
+  pBtn->EnableWindow(IsDlgButtonChecked(IDC_CHECK_FOUND_2_3));
+  pBtn = (CButton*)GetDlgItem(IDC_CHECK_FIX_2_4);
+  pBtn->EnableWindow(IsDlgButtonChecked(IDC_CHECK_FOUND_2_4));
+  pBtn = (CButton*)GetDlgItem(IDC_CHECK_FIX_2_5);
+  pBtn->EnableWindow(IsDlgButtonChecked(IDC_CHECK_FOUND_2_5));
+  pBtn = (CButton*)GetDlgItem(IDC_CHECK_FIX_2_6);
+  pBtn->EnableWindow(IsDlgButtonChecked(IDC_CHECK_FOUND_2_6));
+  pBtn = (CButton*)GetDlgItem(IDC_CHECK_FIX_2_7);
+  pBtn->EnableWindow(IsDlgButtonChecked(IDC_CHECK_FOUND_2_7));
+  pBtn = (CButton*)GetDlgItem(IDC_CHECK_FIX_2_8);
+  pBtn->EnableWindow(IsDlgButtonChecked(IDC_CHECK_FOUND_2_8));
+  pBtn = (CButton*)GetDlgItem(IDC_CHECK_FIX_2_9);
+  pBtn->EnableWindow(IsDlgButtonChecked(IDC_CHECK_FOUND_2_9));
+  pBtn = (CButton*)GetDlgItem(IDC_CHECK_FIX_2_10);
+  pBtn->EnableWindow(IsDlgButtonChecked(IDC_CHECK_FOUND_2_10));
+  pBtn = (CButton*)GetDlgItem(IDC_CHECK_FIX_2_11);
+  pBtn->EnableWindow(IsDlgButtonChecked(IDC_CHECK_FOUND_2_11));
+  pBtn = (CButton*)GetDlgItem(IDC_CHECK_FIX_2_12);
+  pBtn->EnableWindow(IsDlgButtonChecked(IDC_CHECK_FOUND_2_12));
 
   return TRUE;  // return TRUE unless you set the focus to a control
                 // EXCEPTION: OCX Property Pages should return FALSE

@@ -40,6 +40,15 @@
 #define IDC_CHECK_FOUND_2_8             1029
 #define IDC_CHECK_FOUND_2_9             1030
 #define IDC_CHECK_FOUND_1_1             1031
+#define IDC_CHECK_FOUND_2_10            1032
+#define IDC_CHECK_FOUND_2_11            1033
+#define IDC_CHECK_FOUND_2_12            1034
+#define IDC_CHECK_FIX_2_10              1035
+#define IDC_CHECK_FIX_2_11              1036
+#define IDC_CHECK_FIX_2_12              1037
+#define IDC_CHECK_FOUND_2_13            1038
+#define IDC_CHECK_FOUND_1_2             1038
+#define IDC_CHECK_FIX_1_2               1039
 
 // Next default values for new objects
 // 
