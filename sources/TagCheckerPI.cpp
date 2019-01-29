@@ -334,9 +334,9 @@ bool DoRedundantLangAttribute(bool perform_fix) {
     if (CosObjEqual(catalog_lang, CosNewNull()))
       return false;
 
-    ASTCount catalog_lang_count = 0;
-    char* catalog_lang_str = CosStringValue(catalog_lang, &catalog_lang_count);
-    if (catalog_lang_count <= 0)
+    ASTCount catalog_lang_len = 0;
+    char* catalog_lang_str = CosStringValue(catalog_lang, &catalog_lang_len);
+    if (catalog_lang_len <= 0)
       return false;
 
     CosObj element_obj = PDSElementGetCosObj(element);
@@ -344,9 +344,9 @@ bool DoRedundantLangAttribute(bool perform_fix) {
     if (CosObjEqual(element_lang, CosNewNull()))
       return false;
 
-    ASTCount element_lang_count = 0;
-    char* element_lang_str = CosStringValue(element_lang, &element_lang_count);
-    if (element_lang_count > 0)
+    ASTCount element_lang_len = 0;
+    char* element_lang_str = CosStringValue(element_lang, &element_lang_len);
+    if (element_lang_len > 0)
       if (stricmp(element_lang_str, catalog_lang_str) == 0)
         if (!perform_fix) return true; //stop processing the tree
         else CosDictRemove(element_obj, ASAtomFromString("Lang"));
@@ -360,17 +360,34 @@ bool DoActualTextNullTerminator(bool perform_fix) {
   ProcessStructureElementFunction actuals = [](bool perform_fix, PDSElement element,
     ASAtom kid_type, PDSElement kid, PDSMCInfo mcid_info, PDSMC marked_content)
   {
+    bool ret_val = false;
     ASInt32 len = PDSElementGetActualText(element, NULL);
     if (len <= 0)
       return false;
 
-    ASUns8* actual_text = (ASUns8*)ASmalloc(len);
+    ASUns8* actual_text = (ASUns8*)ASmalloc(len + 1);
     PDSElementGetActualText(element, actual_text);
-    if (actual_text[len - 1] == '\0')
-      if (!perform_fix) return true; //stop processing the tree
+    if ((actual_text[0] == 0xFF && actual_text[1] == 0xFE) ||
+        (actual_text[0] == 0xFE && actual_text[1] == 0xFF))
+    {
+      if (actual_text[len - 1] == '\0' && actual_text[len - 2] == '\0')
+      {
+        if (!perform_fix) ret_val = true; //stop processing the tree
+        else PDSElementSetActualText(element, actual_text, len - 2);
+      }
+      else if (actual_text[len - 1] == '\0')
+      {
+        if (!perform_fix) ret_val = true; //stop processing the tree
+        else PDSElementSetActualText(element, actual_text, len - 1);
+      }
+    }
+    else if (actual_text[len - 1] == '\0')
+    {
+      if (!perform_fix) ret_val = true; //stop processing the tree
       else PDSElementSetActualText(element, actual_text, len - 1);
+    }
     ASfree(actual_text);
-    return false;
+    return ret_val;
   };
   return DoStructureElement(perform_fix, actuals);
 }
