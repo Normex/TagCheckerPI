@@ -44,7 +44,7 @@ bool DoStructureElement(PDDoc pd_doc, PDSElement element, bool perform_fix, Proc
       NULL);    //The CosObj of the page containing the kid or NULL
 
     // calls callback that performs the check or the fix
-    if (callback(perform_fix, element, kid_type, kid,mcid_info, marked_content))
+    if (callback(perform_fix, element, kid_type, kid, mcid_info, marked_content))
       return true;
 
     if (kid_type == ASAtomFromString("StructElem")) {
@@ -67,6 +67,8 @@ bool DoStructureElement(bool perform_fix, ProcessStructureElementFunction callba
     PDSElement elem;
     for (ASInt32 i = 0; i < num; i++) {
       PDSTreeRootGetKid(pds_tree_root, i, &elem);
+      if (callback(perform_fix, CosNewNull(), ASAtomFromString("StructElem"), elem, PDSMCInfo(), NULL))
+        return true;
       to_ret = to_ret || DoStructureElement(pd_doc, elem, perform_fix, callback);
     }
   }
@@ -188,14 +190,17 @@ bool DoAttributes(bool perform_fix) {
   ProcessStructureElementFunction attributes = [](bool perform_fix, PDSElement element,
     ASAtom kid_type, CosObj kid, PDSMCInfo mcid_info, PDSMC marked_content)
   {
-    CosObj element_obj = PDSElementGetCosObj(element);
-    CosObj attr_obj = CosDictGet(element_obj, ASAtomFromString("A"));
+    if (kid_type != ASAtomFromString("StructElem"))
+      return false;
+
+    CosObj kid_obj = PDSElementGetCosObj(kid);
+    CosObj attr_obj = CosDictGet(kid_obj, ASAtomFromString("A"));
     if (CosObjEqual(attr_obj, CosNewNull()))
       return false;
 
     if (CosObjEnum(attr_obj, myCosDictEnumProc, NULL))
       if (!perform_fix) return true; //stop processing the tree
-      else CosDictRemove(element_obj, ASAtomFromString("A"));
+      else CosDictRemove(kid_obj, ASAtomFromString("A"));
 
     return false;
   };
@@ -207,8 +212,11 @@ bool DoTitleEntries(bool perform_fix) {
   ProcessStructureElementFunction titleEntries = [](bool perform_fix, PDSElement element,
     ASAtom kid_type, CosObj kid, PDSMCInfo mcid_info, PDSMC marked_content)
   {
-    CosObj element_obj = PDSElementGetCosObj(element);
-    CosObj title_obj = CosDictGet(element_obj, ASAtomFromString("T"));
+    if (kid_type != ASAtomFromString("StructElem"))
+      return false;
+
+    CosObj kid_obj = PDSElementGetCosObj(kid);
+    CosObj title_obj = CosDictGet(kid_obj, ASAtomFromString("T"));
     if (CosObjEqual(title_obj, CosNewNull()))
       return false;
 
@@ -216,7 +224,7 @@ bool DoTitleEntries(bool perform_fix) {
     CosStringValue(title_obj, &count);
     if (count == 0)
       if (!perform_fix) return true; //stop processing the tree
-      else CosDictRemove(element_obj, ASAtomFromString("T"));
+      else CosDictRemove(kid_obj, ASAtomFromString("T"));
 
     return false;
   };
@@ -228,8 +236,11 @@ bool DoIDEntries(bool perform_fix) {
   ProcessStructureElementFunction ids = [](bool perform_fix, PDSElement element, 
     ASAtom kid_type, CosObj kid, PDSMCInfo mcid_info, PDSMC marked_content)
   {
-    CosObj element_obj = PDSElementGetCosObj(element);
-    CosObj id_obj = CosDictGet(element_obj, ASAtomFromString("ID"));
+    if (kid_type != ASAtomFromString("StructElem"))
+      return false;
+
+    CosObj kid_obj = PDSElementGetCosObj(kid);
+    CosObj id_obj = CosDictGet(kid_obj, ASAtomFromString("ID"));
     if (CosObjEqual(id_obj, CosNewNull()))
       return false;
 
@@ -237,7 +248,7 @@ bool DoIDEntries(bool perform_fix) {
     CosStringValue(id_obj, &count);
     if (count == 0)
       if (!perform_fix) return true; //stop processing the tree
-      else CosDictRemove(element_obj, ASAtomFromString("ID"));
+      else CosDictRemove(kid_obj, ASAtomFromString("ID"));
 
     return false;
   };
@@ -328,6 +339,9 @@ bool DoRedundantLangAttribute(bool perform_fix) {
   ProcessStructureElementFunction ids = [](bool perform_fix, PDSElement element,
     ASAtom kid_type, PDSElement kid, PDSMCInfo mcid_info, PDSMC marked_content)
   {
+    if (kid_type != ASAtomFromString("StructElem"))
+      return false;
+
     CosObj catalog = CosDocGetRoot(PDDocGetCosDoc(AVDocGetPDDoc(AVAppGetActiveDoc())));
     CosObj catalog_lang = CosDictGet(catalog, ASAtomFromString("Lang"));
 
@@ -339,17 +353,17 @@ bool DoRedundantLangAttribute(bool perform_fix) {
     if (catalog_lang_len <= 0)
       return false;
 
-    CosObj element_obj = PDSElementGetCosObj(element);
-    CosObj element_lang = CosDictGet(element_obj, ASAtomFromString("Lang"));
-    if (CosObjEqual(element_lang, CosNewNull()))
+    CosObj kid_obj = PDSElementGetCosObj(kid);
+    CosObj kid_lang = CosDictGet(kid_obj, ASAtomFromString("Lang"));
+    if (CosObjEqual(kid_lang, CosNewNull()))
       return false;
 
-    ASTCount element_lang_len = 0;
-    char* element_lang_str = CosStringValue(element_lang, &element_lang_len);
-    if (element_lang_len > 0)
-      if (stricmp(element_lang_str, catalog_lang_str) == 0)
+    ASTCount kid_lang_len = 0;
+    char* kid_lang_str = CosStringValue(kid_lang, &kid_lang_len);
+    if (kid_lang_len > 0)
+      if (stricmp(kid_lang_str, catalog_lang_str) == 0)
         if (!perform_fix) return true; //stop processing the tree
-        else CosDictRemove(element_obj, ASAtomFromString("Lang"));
+        else CosDictRemove(kid_obj, ASAtomFromString("Lang"));
 
     return false;
   };
@@ -361,30 +375,37 @@ bool DoActualTextNullTerminator(bool perform_fix) {
     ASAtom kid_type, PDSElement kid, PDSMCInfo mcid_info, PDSMC marked_content)
   {
     bool ret_val = false;
-    ASInt32 len = PDSElementGetActualText(element, NULL);
+
+    if (kid_type != ASAtomFromString("StructElem"))
+      return false;
+
+    ASInt32 len = PDSElementGetActualText(kid, NULL);
     if (len <= 0)
       return false;
 
     ASUns8* actual_text = (ASUns8*)ASmalloc(len + 1);
-    PDSElementGetActualText(element, actual_text);
-    if ((actual_text[0] == 0xFF && actual_text[1] == 0xFE) ||
+    PDSElementGetActualText(kid, actual_text);
+    if (len >= 2 && (actual_text[0] == 0xFF && actual_text[1] == 0xFE) ||
         (actual_text[0] == 0xFE && actual_text[1] == 0xFF))
     {
       if (actual_text[len - 1] == '\0' && actual_text[len - 2] == '\0')
-      {
         if (!perform_fix) ret_val = true; //stop processing the tree
-        else PDSElementSetActualText(element, actual_text, len - 2);
-      }
-      else if (actual_text[len - 1] == '\0')
-      {
-        if (!perform_fix) ret_val = true; //stop processing the tree
-        else PDSElementSetActualText(element, actual_text, len - 1);
-      }
+        else if (len == 2)
+        {
+          CosObj kid_obj = PDSElementGetCosObj(kid);
+          CosDictRemove(kid_obj, ASAtomFromString("ActualText"));
+        }
+        else PDSElementSetActualText(kid, actual_text, len - 2);
     }
     else if (actual_text[len - 1] == '\0')
     {
       if (!perform_fix) ret_val = true; //stop processing the tree
-      else PDSElementSetActualText(element, actual_text, len - 1);
+      else if (len == 1)
+      {
+        CosObj kid_obj = PDSElementGetCosObj(kid);
+        CosDictRemove(kid_obj, ASAtomFromString("ActualText"));
+      }
+      else PDSElementSetActualText(kid, actual_text, len - 1);
     }
     ASfree(actual_text);
     return ret_val;
