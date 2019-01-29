@@ -10,10 +10,14 @@ The current implementation is able to to perform following tasks:
 * Remove empty ID on Structure Elements (removes "ID" entry from every structure element only if the "ID" is an empty string)
 * Remove Output Intents entry (OutputIntents dictionary from catalog is removed if exists)
 * Remove Acroform entry (if Fields entry in AcroFom is empty array, we remove whole AcroForm entry in catalog dictionary)
-
-Not yet implemented, but planned tasks:
 * Remove empty ID Tree
 * Remove redundant Lang attribute on Structure Elements
+* Remove empty Outlines
+* Remove Extensions from the document catalog
+* Remove empty Page Layout
+* Remove the null terminator from Actual Text
+
+Not yet implemented, but planned tasks:
 * Fonts not embedded or subsetted
 * Uncompressed content streams
 * Uncompressed object streams
