@@ -36,22 +36,8 @@ BEGIN
         VERTGUIDE, 146
         VERTGUIDE, 176
         TOPMARGIN, 7
-        BOTTOMMARGIN, 247
+        BOTTOMMARGIN, 259
         HORZGUIDE, 19
-        HORZGUIDE, 47
-        HORZGUIDE, 60
-        HORZGUIDE, 70
-        HORZGUIDE, 80
-        HORZGUIDE, 90
-        HORZGUIDE, 100
-        HORZGUIDE, 110
-        HORZGUIDE, 120
-        HORZGUIDE, 130
-        HORZGUIDE, 140
-        HORZGUIDE, 150
-        HORZGUIDE, 160
-        HORZGUIDE, 170
-        HORZGUIDE, 180
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -62,13 +48,13 @@ END
 // Dialog
 //
 
-IDD_TAGCHECKER_DLG DIALOGEX 0, 0, 207, 254
+IDD_TAGCHECKER_DLG DIALOGEX 0, 0, 207, 266
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Tag Checker"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,96,234,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,150,234,54,14
+    DEFPUSHBUTTON   "OK",IDOK,96,246,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,150,246,54,14
     CONTROL         "",IDC_CHECK_FIX_1_1,"Button",BS_AUTOCHECKBOX | BS_BITMAP | WS_TABSTOP,174,42,8,10
     LTEXT           "Found",IDC_STATIC,138,30,21,8
     LTEXT           "Fix",IDC_STATIC,174,30,10,8
@@ -93,29 +79,32 @@ BEGIN
     CONTROL         "",IDC_CHECK_FOUND_2_8,"Button",BS_AUTOCHECKBOX | BS_BITMAP | WS_DISABLED | WS_TABSTOP,144,162,8,10
     CONTROL         "",IDC_CHECK_FOUND_2_9,"Button",BS_AUTOCHECKBOX | BS_BITMAP | WS_DISABLED | WS_TABSTOP,144,174,8,10
     CONTROL         "",IDC_CHECK_FOUND_1_1,"Button",BS_AUTOCHECKBOX | BS_BITMAP | WS_DISABLED | WS_TABSTOP,144,42,8,10
-    LTEXT           "SE not aligned with Tag",IDC_STATIC,6,42,117,8
-    LTEXT           "Empty Class Map",IDC_STATIC,6,78,117,8
-    LTEXT           "Empty Role Map",IDC_STATIC,6,90,117,8
-    LTEXT           "Empty Title Entries",IDC_STATIC,6,126,117,8
-    LTEXT           "Empty ID Tree",IDC_STATIC,6,102,117,8
-    LTEXT           "Empty Attributes",IDC_STATIC,6,114,117,8
-    LTEXT           "Empty ID Entries",IDC_STATIC,6,138,117,10
-    LTEXT           "Output Intents",IDC_STATIC,6,150,117,8
-    LTEXT           "Empty Acroform",IDC_STATIC,6,162,117,8
-    LTEXT           "Redundant Lang Attribute",IDC_STATIC,6,174,117,8
+    LTEXT           "SE not aligned with Tag",IDC_STATIC,12,42,117,8
+    LTEXT           "Empty Class Map",IDC_STATIC,12,78,117,8
+    LTEXT           "Empty Role Map",IDC_STATIC,12,90,117,8
+    LTEXT           "Empty Title Entries",IDC_STATIC,12,126,117,8
+    LTEXT           "Empty ID Tree",IDC_STATIC,12,102,117,8
+    LTEXT           "Empty Attributes",IDC_STATIC,12,114,117,8
+    LTEXT           "Empty ID Entries",IDC_STATIC,12,138,117,10
+    LTEXT           "Output Intents",IDC_STATIC,12,150,117,8
+    LTEXT           "Empty Acroform",IDC_STATIC,12,162,117,8
+    LTEXT           "Redundant Lang Attribute",IDC_STATIC,12,174,117,8
     LTEXT           "The plug-in for developing PDF Techniques for Accessibility\nsee: https://github.com/Normex/TagCheckerPI ",IDC_STATIC,7,8,193,19
-    LTEXT           "Empty Outlines",IDC_STATIC,6,186,117,8
-    LTEXT           "Empty Extensions",IDC_STATIC,6,198,117,8
-    LTEXT           "Empty Page Layout",IDC_STATIC,6,210,117,8
+    LTEXT           "Empty Outlines",IDC_STATIC,12,186,117,8
+    LTEXT           "Empty Extensions",IDC_STATIC,12,198,117,8
+    LTEXT           "Empty Page Layout",IDC_STATIC,12,210,117,8
     CONTROL         "",IDC_CHECK_FOUND_2_10,"Button",BS_AUTOCHECKBOX | BS_BITMAP | WS_DISABLED | WS_TABSTOP,144,186,8,10
     CONTROL         "",IDC_CHECK_FOUND_2_11,"Button",BS_AUTOCHECKBOX | BS_BITMAP | WS_DISABLED | WS_TABSTOP,144,198,8,10
     CONTROL         "",IDC_CHECK_FOUND_2_12,"Button",BS_AUTOCHECKBOX | BS_BITMAP | WS_DISABLED | WS_TABSTOP,144,210,8,10
     CONTROL         "",IDC_CHECK_FIX_2_10,"Button",BS_AUTOCHECKBOX | BS_BITMAP | WS_TABSTOP,174,186,8,10
     CONTROL         "",IDC_CHECK_FIX_2_11,"Button",BS_AUTOCHECKBOX | BS_BITMAP | WS_TABSTOP,174,198,8,10
     CONTROL         "",IDC_CHECK_FIX_2_12,"Button",BS_AUTOCHECKBOX | BS_BITMAP | WS_TABSTOP,174,210,8,10
-    LTEXT           "Actual Text Null Terminator",IDC_STATIC,6,54,117,8
+    LTEXT           "Actual Text Null Terminator",IDC_STATIC,12,54,117,8
     CONTROL         "",IDC_CHECK_FOUND_1_2,"Button",BS_AUTOCHECKBOX | BS_BITMAP | WS_DISABLED | WS_TABSTOP,144,54,8,10
     CONTROL         "",IDC_CHECK_FIX_1_2,"Button",BS_AUTOCHECKBOX | BS_BITMAP | WS_TABSTOP,174,54,8,10
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDFRAME,6,222,186,1
+    CONTROL         "",IDC_CHECK_FIX_ALL,"Button",BS_AUTOCHECKBOX | BS_BITMAP | WS_TABSTOP,174,228,8,10
+    LTEXT           "Select All",IDC_STATIC,12,228,117,8
 END
 
 

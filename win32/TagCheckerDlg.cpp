@@ -37,8 +37,9 @@ void CTagCheckerDlg::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CTagCheckerDlg, CDialogEx)
   ON_WM_ACTIVATE()
-  ON_BN_CLICKED(IDOK, &CTagCheckerDlg::OnBnClickedOk)
-  ON_CONTROL_RANGE(BN_CLICKED, IDC_CHECK_FIX_1_1, IDC_CHECK_FIX_1_2, &CTagCheckerDlg::OnCheckFix)
+  ON_BN_CLICKED(IDOK, &OnBnClickedOk)
+  ON_BN_CLICKED(IDC_CHECK_FIX_ALL, &OnCheckFixAll)
+  ON_CONTROL_RANGE(BN_CLICKED, IDC_CHECK_FIX_1_1, IDC_CHECK_FIX_1_2, &OnCheckFix)
 END_MESSAGE_MAP()
 
 
@@ -48,27 +49,27 @@ void CTagCheckerDlg::OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized)
   CDialogEx::OnActivate(nState, pWndOther, bMinimized);
 }
 
+void CTagCheckerDlg::OnCheckFixAll()
+{
+  UINT bFixAll = IsDlgButtonChecked(IDC_CHECK_FIX_ALL);
+ 
+    for (const UINT* id = fixIds; *id; ++id) //Uncheck all
+    {
+      CWnd* idWnd = GetDlgItem(*id);
+      if (!idWnd->IsWindowEnabled())
+        continue;
+      CheckDlgButton(*id, bFixAll);
+    }
+    SetOKBtnState();
+}
+
 void CTagCheckerDlg::OnCheckFix(UINT nID)
 {
-  bool isFixId = false;
-  for (const UINT* p = fixIds; *p; ++p)
-    if (nID == *p)
-    {
-      isFixId = true;
-      break;
-    }
-
-  if (!isFixId)
+  if (!IsInFixIdsRange(nID))
     return;
 
-  mOKBtn->EnableWindow(FALSE);
-  for (const UINT* p = fixIds; *p; ++p)
-  {
-    if (IsDlgButtonChecked(*p)) {
-      mOKBtn->EnableWindow(TRUE);
-      return;
-    }
-  }
+  SetFixAllCheckBtnState();
+  SetOKBtnState();
 }
 
 void CTagCheckerDlg::OnBnClickedOk()
@@ -95,9 +96,6 @@ void CTagCheckerDlg::OnBnClickedOk()
 BOOL CTagCheckerDlg::OnInitDialog()
 {
   CDialogEx::OnInitDialog();
-
-  mOKBtn = (CButton*)GetDlgItem(IDOK);
-  mOKBtn->EnableWindow(FALSE);
 
   CheckDlgButton(IDC_CHECK_FOUND_1_1, DoAllignSEWithMC());
   CheckDlgButton(IDC_CHECK_FOUND_1_2, DoActualTextNullTerminator());
@@ -143,6 +141,59 @@ BOOL CTagCheckerDlg::OnInitDialog()
   pBtn = (CButton*)GetDlgItem(IDC_CHECK_FIX_2_12);
   pBtn->EnableWindow(IsDlgButtonChecked(IDC_CHECK_FOUND_2_12));
 
+  SetOKBtnState();
+  SetFixAllCheckBtnState();
+
   return TRUE;  // return TRUE unless you set the focus to a control
                 // EXCEPTION: OCX Property Pages should return FALSE
+}
+
+void CTagCheckerDlg::SetOKBtnState()
+{
+  BOOL bEnableOK = FALSE;
+  for (const UINT* id = fixIds; *id; ++id)
+  {
+    if (IsDlgButtonChecked(*id)) {
+      bEnableOK = TRUE;
+      break;
+    }
+  }
+  CButton* pButton = (CButton*)GetDlgItem(IDOK);
+  pButton->EnableWindow(bEnableOK);
+}
+
+BOOL CTagCheckerDlg::IsFixEnabled()
+{
+  BOOL isEnabled = FALSE;
+  for (const UINT* id = fixIds; *id; ++id) {
+    CWnd* idWnd = GetDlgItem(*id);
+    if (idWnd->IsWindowEnabled())
+      isEnabled = TRUE;
+  }
+  return isEnabled;
+}
+
+void CTagCheckerDlg::SetFixAllCheckBtnState()
+{
+  BOOL bCheckFixAll = TRUE;
+  for (const UINT* id = fixIds; *id; ++id) {
+    CWnd* idWnd = GetDlgItem(*id);
+    if (idWnd->IsWindowEnabled() && !IsDlgButtonChecked(*id)) {
+      bCheckFixAll = FALSE;
+      break;
+    }
+  }
+  CheckDlgButton(IDC_CHECK_FIX_ALL, bCheckFixAll);
+}
+
+bool CTagCheckerDlg::IsInFixIdsRange(UINT nID)
+{
+  bool isFixId = false;
+  for (const UINT* id = fixIds; *id; ++id) {
+    if (nID == *id) {
+      isFixId = true;
+      break;
+    }
+  }
+  return isFixId;
 }

@@ -46,9 +46,9 @@
 #define IDC_CHECK_FIX_2_10              1035
 #define IDC_CHECK_FIX_2_11              1036
 #define IDC_CHECK_FIX_2_12              1037
-#define IDC_CHECK_FOUND_2_13            1038
 #define IDC_CHECK_FOUND_1_2             1038
 #define IDC_CHECK_FIX_1_2               1039
+#define IDC_CHECK_FIX_ALL               1040
 
 // Next default values for new objects
 // 
@@ -56,7 +56,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        108
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1018
+#define _APS_NEXT_CONTROL_VALUE         1041
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
