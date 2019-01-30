@@ -360,10 +360,12 @@ bool DoRedundantLangAttribute(bool perform_fix) {
 
     ASTCount kid_lang_len = 0;
     char* kid_lang_str = CosStringValue(kid_lang, &kid_lang_len);
-    if (kid_lang_len > 0)
-      if (stricmp(kid_lang_str, catalog_lang_str) == 0)
-        if (!perform_fix) return true; //stop processing the tree
-        else CosDictRemove(kid_obj, ASAtomFromString("Lang"));
+    if (kid_lang_len <= 0)
+      return false;
+
+    if (_stricmp(kid_lang_str, catalog_lang_str) == 0)
+      if (!perform_fix) return true; //stop processing the tree
+      else CosDictRemove(kid_obj, ASAtomFromString("Lang"));
 
     return false;
   };
