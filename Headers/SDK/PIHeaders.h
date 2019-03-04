@@ -81,11 +81,9 @@
 #endif
 #include "WLHFT.h"
 #ifndef UNIX_PLATFORM
-#include "CatHFT.h"
+//rt #include "CatHFT.h"
 #endif
-#include "ConsHFT.h"
-
-
+//rt #include "ConsHFT.h"
 // Acrobat 6.0 Headers
 #include "AcroColorCalls.h"
 #include "ASKey.h"

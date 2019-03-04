@@ -1,0 +1,6 @@
+// Deployment location
+PRODUCT_DEPLOYMENT_LOCATION = bin/debug
+
+#include "ProjectConfigurations/ProjectDefault.xcconfig"
+#include "../Headers/SDK/MacSDKConfigurations/Debug.xcconfig"
+

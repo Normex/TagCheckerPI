@@ -1,9 +1,10 @@
-#include "stdafx.h"
-
 #ifndef MAC_PLATFORM
+#include "stdafx.h"
 #include "PIHeaders.h"
-#include "TagCheckerDlg.h"
 #endif
+
+// mac & win have the same name
+#include "TagCheckerDlg.h"
 
 static AVMenuItem menu_item = NULL;
 
@@ -16,11 +17,13 @@ ACCB1 ASBool ACCB2 IsFileOpen(void *clientData) {
   return (AVAppGetActiveDoc() != NULL);
 }
 
+
 //*****************************************************************************
 ACCB1 void ACCB2 TagCheckerCommand(void *clientData) {
 
 #ifdef MAC_PLATFORM
-  not implemented
+    [[TagCheckerDlg alloc] init];
+    int okPressed = [[TagCheckerDlg tagCheckerDlg] showWindow];
 #else
   CTagCheckerDlg dlg;
   dlg.DoModal();

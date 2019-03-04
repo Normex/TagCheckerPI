@@ -1,13 +1,13 @@
 
-#include "stdafx.h"
-
 #ifndef MAC_PLATFORM
+#include "stdafx.h"
+#include "commctrl.h"
 #include "PIHeaders.h"
 #endif
-#include "commctrl.h"
+
 #include <functional>
 
-typedef std::function< bool(bool perform_fix, 
+typedef std::function< bool(bool perform_fix,
                             PDSElement element,
                             ASAtom kid_type, 
                             CosObj kid, 
@@ -363,7 +363,8 @@ bool DoRedundantLangAttribute(bool perform_fix) {
     if (kid_lang_len <= 0)
       return false;
 
-    if (_stricmp(kid_lang_str, catalog_lang_str) == 0)
+    //if (_stricmp(kid_lang_str, catalog_lang_str) == 0)
+    if (strcmp(kid_lang_str, catalog_lang_str) == 0)
       if (!perform_fix) return true; //stop processing the tree
       else CosDictRemove(kid_obj, ASAtomFromString("Lang"));
 

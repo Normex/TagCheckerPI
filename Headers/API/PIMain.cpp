@@ -17,7 +17,9 @@
  - Source code that must be linked into every plug-in.
 
 *********************************************************************/
+#if WIN_PLATFORM
 #include "stdafx.h"
+#endif
 
 #include "Environ.h"
 
@@ -47,8 +49,6 @@
 #else
 #error platform not defined
 #endif
-
-//#include "tinyxml2.h"
 
 /* This is for testing only.  Leave it set to 0xFFFFFFFF for final version */
 #define TEST_OLD_VERSION 0xFFFFFFFF /*set lower to test old versions.  set to 0x00050000 to simulate acrobat 5.0*/
