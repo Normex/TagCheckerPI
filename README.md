@@ -45,7 +45,7 @@ The dialog is accessible only on active document from Adobe Acrobat menu Plug-in
  Download plug in from bin folder (https://github.com/Normex/TagCheckerPI/blob/master/bin/TagCheckerPI.api ) to your Adobe Acrobat plug in folder (usually: c:\Program Files (x86)\Adobe\Acrobat DC\Acrobat\plug_ins\ )
 
 ## Mac:
-Download plug in from bin folder (https://github.com/Normex/TagCheckerPI/blob/master/bin/TagCheckerPI.acroplugin ) to your Adobe Acrobat plug in folder (usually: /Users/(username)/Library/Application Support/Adobe/Acrobat/DC/Plug-ins)
+Download plug in from bin folder (https://github.com/Normex/TagCheckerPI/blob/master/bin/TagCheckerPI.acroplugin.zip ) and unzip to your Adobe Acrobat plug in folder (usually: /Users/(username)/Library/Application Support/Adobe/Acrobat/DC/Plug-ins)
 
 ## Compilation
 Whoever wants to compile plug in from sources probably knows what to do :) We used VS 2015 and XCode 10.1, but newer version should compile that just fine.
