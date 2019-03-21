@@ -5,7 +5,14 @@
 #include "PIHeaders.h"
 #endif
 
+#include <algorithm>
 #include <functional>
+#include <vector>
+
+struct dictionary_keys {
+  std::vector<ASAtom> to_keep;
+  std::vector<ASAtom> to_remove;
+};
 
 typedef std::function< bool(bool perform_fix,
                             PDSElement element,
@@ -16,8 +23,27 @@ typedef std::function< bool(bool perform_fix,
 
 //*****************************************************************************
 // callback to check if Dictionary is empty
-static ACCB1 ASBool ACCB2 myCosDictEnumProc(CosObj obj, CosObj value, void* clientData) {
+static ACCB1 ASBool ACCB2 MyCosDictEnumProc(CosObj obj, CosObj value, void* clientData) {
   return false;
+}
+
+//*****************************************************************************
+// callback to get keys which should be removed 
+static ACCB1 ASBool ACCB2 GetKeysEnumProc(CosObj key, CosObj value, void* clientData) {
+  if (!clientData)
+    return false;
+
+  dictionary_keys* keys = (dictionary_keys*)clientData;
+  std::vector<ASAtom>::iterator pos = std::find_if(keys->to_keep.begin(), keys->to_keep.end(),
+    [&key](const ASAtom& it) -> bool { return CosNameValue(key) == it; });
+  
+  //found, therefor return and do not add to to_remove keys
+  if (pos != keys->to_keep.end())
+    return true;
+   
+  //not found in wanted keys therefor push to to_remove keys, which are to be deleted
+  keys->to_remove.push_back(CosNameValue(key));
+  return true;
 }
 
 //*****************************************************************************
@@ -139,7 +165,7 @@ bool DoClassMap(bool perform_fix) {
   if (CosObjEqual(class_map, CosNewNull()))
     return false;
 
-  if (CosObjEnum(class_map, myCosDictEnumProc, NULL))
+  if (CosObjEnum(class_map, MyCosDictEnumProc, NULL))
     if (!perform_fix) return true; //stop processing the tree
     else PDSTreeRootRemoveClassMap(pds_tree_root);
 
@@ -158,7 +184,7 @@ bool DoRoleMap(bool perform_fix) {
   if (CosObjEqual(role_map, CosNewNull()))
     return false;
 
-  if (CosObjEnum(role_map, myCosDictEnumProc, NULL))
+  if (CosObjEnum(role_map, MyCosDictEnumProc, NULL))
     if (!perform_fix) return true; //stop processing the tree
     else PDSTreeRootRemoveRoleMap(pds_tree_root);
 
@@ -177,7 +203,7 @@ bool DoIDTree(bool perform_fix) {
     return false;
 
   CosObj names = CosDictGet(idtree_obj, ASAtomFromString("Names"));
-  if ((CosObjEnum(idtree_obj, myCosDictEnumProc, NULL)) ||
+  if ((CosObjEnum(idtree_obj, MyCosDictEnumProc, NULL)) ||
       (CosObjGetType(names) == CosArray) && (CosArrayLength(names) == 0))
     if (!perform_fix) return true; //stop processing the tree
     else CosDictRemove(pds_tree_root, ASAtomFromString("IDTree"));
@@ -198,7 +224,7 @@ bool DoAttributes(bool perform_fix) {
     if (CosObjEqual(attr_obj, CosNewNull()))
       return false;
 
-    if (CosObjEnum(attr_obj, myCosDictEnumProc, NULL))
+    if (CosObjEnum(attr_obj, MyCosDictEnumProc, NULL))
       if (!perform_fix) return true; //stop processing the tree
       else CosDictRemove(kid_obj, ASAtomFromString("A"));
 
@@ -256,6 +282,58 @@ bool DoIDEntries(bool perform_fix) {
 }
 
 //*****************************************************************************
+void CleanViewerPreferences() {
+  CosObj catalog = CosDocGetRoot(PDDocGetCosDoc(AVDocGetPDDoc(AVAppGetActiveDoc())));
+  CosObj vp = CosDictGet(catalog, ASAtomFromString("ViewerPreferences"));
+
+  if (CosObjEqual(vp, CosNewNull()))
+    return;
+
+  dictionary_keys viewer_preferences_keys;
+  viewer_preferences_keys.to_keep.push_back(ASAtomFromString("DisplayDocTitle"));
+
+  CosObjEnum(vp, GetKeysEnumProc, &viewer_preferences_keys);
+
+  for (ASAtom key_to_remove : viewer_preferences_keys.to_remove)
+  {
+    CosDictRemove(vp, key_to_remove);
+#ifdef _DEBUG
+    OutputDebugString("Removed: ");
+    OutputDebugString(ASAtomGetString(key_to_remove));
+    OutputDebugString("\n");
+#endif // _DEBUG
+  }
+}
+
+//*****************************************************************************
+void CleanDocumentCatalog() {
+  CosObj catalog = CosDocGetRoot(PDDocGetCosDoc(AVDocGetPDDoc(AVAppGetActiveDoc())));
+  if (CosObjEqual(catalog, CosNewNull()))
+    return;
+
+  dictionary_keys catalog_keys;
+  catalog_keys.to_keep.push_back(ASAtomFromString("Lang"));
+  catalog_keys.to_keep.push_back(ASAtomFromString("MarkInfo"));
+  catalog_keys.to_keep.push_back(ASAtomFromString("Metadata"));
+  catalog_keys.to_keep.push_back(ASAtomFromString("Pages"));
+  catalog_keys.to_keep.push_back(ASAtomFromString("StructTreeRoot"));
+  catalog_keys.to_keep.push_back(ASAtomFromString("Type"));
+  catalog_keys.to_keep.push_back(ASAtomFromString("ViewerPreferences"));
+
+  CosObjEnum(catalog, GetKeysEnumProc, &catalog_keys);
+
+  for (ASAtom key_to_remove : catalog_keys.to_remove)
+  {
+    CosDictRemove(catalog, key_to_remove);
+#ifdef _DEBUG
+    OutputDebugString("Removed: ");
+    OutputDebugString(ASAtomGetString(key_to_remove));
+    OutputDebugString("\n");
+#endif // _DEBUG
+  }
+}
+
+//*****************************************************************************
 bool DoOutputIntents(bool perform_fix) {
   //*Remove Output Intents entry (OutputIntents dictionary from catalog is removed if exists)
   CosObj catalog = CosDocGetRoot(PDDocGetCosDoc(AVDocGetPDDoc(AVAppGetActiveDoc())));
@@ -278,7 +356,7 @@ bool DoAcroform(bool perform_fix) {
     return false;
 
   CosObj fields = CosDictGet(acroform, ASAtomFromString("Fields"));
-  if ((CosObjEnum(acroform, myCosDictEnumProc, NULL)) ||
+  if ((CosObjEnum(acroform, MyCosDictEnumProc, NULL)) ||
       (CosObjGetType(fields) == CosArray) && (CosArrayLength(fields) == 0))
     if (!perform_fix) return true; //stop processing the tree
     else CosDictRemove(catalog, ASAtomFromString("AcroForm"));
@@ -295,7 +373,7 @@ bool DoOutlines(bool perform_fix) {
     return false;
 
   CosObj count = CosDictGet(outlines, ASAtomFromString("Count"));
-  if ((CosObjEnum(outlines, myCosDictEnumProc, NULL)) ||
+  if ((CosObjEnum(outlines, MyCosDictEnumProc, NULL)) ||
     (CosObjGetType(count) == CosInteger) && (CosIntegerValue(count) == 0))
     if (!perform_fix) return true; //stop processing the tree
     else CosDictRemove(catalog, ASAtomFromString("Outlines"));
@@ -311,7 +389,7 @@ bool DoExtensions(bool perform_fix) {
   if (CosObjEqual(extensions, CosNewNull()))
     return false;
 
-  if (CosObjEnum(extensions, myCosDictEnumProc, NULL))
+  if (CosObjEnum(extensions, MyCosDictEnumProc, NULL))
     if (!perform_fix) return true; //stop processing the tree
     else CosDictRemove(catalog, ASAtomFromString("Extensions"));
 
