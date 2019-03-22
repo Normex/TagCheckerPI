@@ -22,5 +22,7 @@ bool DoExtensions(bool perform_fix = false);
 bool DoPageLayout(bool perform_fix = false);
 bool DoRedundantLangAttribute(bool perform_fix = false);
 bool DoActualTextNullTerminator(bool perform_fix = false);
+void CleanViewerPreferences();
+void CleanDocumentCatalog();
 
 #endif

@@ -16,6 +16,8 @@ The current implementation is able to to perform following tasks:
 * Remove Extensions from the document catalog
 * Remove empty Page Layout
 * Remove the null terminator from Actual Text
+* Wipe the Document Catalog dictonary removing all entries except Lang, MarkInfo, Metadata, Pages, StructTreeRoot, Type, ViewerPreferences
+* Wipe the ViewerPreferences dictionary in the Document Catalog except DisplayDocTitle
 
 Not yet implemented, but planned tasks:
 * Fonts not embedded or subsetted
@@ -29,7 +31,6 @@ Not sure about these:
 * Unnecessary owner dictionaries
 
 # Licensing
-
 Keep in mind that this is not a tool for professional usage. We can't guarantee anything. If you want to use it for different purposes than generating files for PDF Techniques Accessibility LWG, please let us know.
 
 # Documentation
@@ -51,6 +52,5 @@ Download plug in from bin folder (https://github.com/Normex/TagCheckerPI/blob/ma
 Whoever wants to compile plug in from sources probably knows what to do :) We used VS 2015 and XCode 10.1, but newer version should compile that just fine.
 
 # Feedback, participate
-
 Feel free to submit comments, questions, suggestions either to github issues section or PDF Techniques Accessibility LWG mailing list or directly to us.
 Do you want to add your own tasks? new functionality? Please use pull requests.

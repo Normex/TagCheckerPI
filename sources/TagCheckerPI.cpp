@@ -33,7 +33,7 @@ static ACCB1 ASBool ACCB2 GetKeysEnumProc(CosObj key, CosObj value, void* client
   if (!clientData)
     return false;
 
-  dictionary_keys* keys = (dictionary_keys*)clientData;
+  dictionary_keys* keys = reinterpret_cast<dictionary_keys*>(clientData);
   std::vector<ASAtom>::iterator pos = std::find_if(keys->to_keep.begin(), keys->to_keep.end(),
     [&key](const ASAtom& it) -> bool { return CosNameValue(key) == it; });
   
@@ -282,58 +282,6 @@ bool DoIDEntries(bool perform_fix) {
 }
 
 //*****************************************************************************
-void CleanViewerPreferences() {
-  CosObj catalog = CosDocGetRoot(PDDocGetCosDoc(AVDocGetPDDoc(AVAppGetActiveDoc())));
-  CosObj vp = CosDictGet(catalog, ASAtomFromString("ViewerPreferences"));
-
-  if (CosObjEqual(vp, CosNewNull()))
-    return;
-
-  dictionary_keys viewer_preferences_keys;
-  viewer_preferences_keys.to_keep.push_back(ASAtomFromString("DisplayDocTitle"));
-
-  CosObjEnum(vp, GetKeysEnumProc, &viewer_preferences_keys);
-
-  for (ASAtom key_to_remove : viewer_preferences_keys.to_remove)
-  {
-    CosDictRemove(vp, key_to_remove);
-#ifdef _DEBUG
-    OutputDebugString("Removed: ");
-    OutputDebugString(ASAtomGetString(key_to_remove));
-    OutputDebugString("\n");
-#endif // _DEBUG
-  }
-}
-
-//*****************************************************************************
-void CleanDocumentCatalog() {
-  CosObj catalog = CosDocGetRoot(PDDocGetCosDoc(AVDocGetPDDoc(AVAppGetActiveDoc())));
-  if (CosObjEqual(catalog, CosNewNull()))
-    return;
-
-  dictionary_keys catalog_keys;
-  catalog_keys.to_keep.push_back(ASAtomFromString("Lang"));
-  catalog_keys.to_keep.push_back(ASAtomFromString("MarkInfo"));
-  catalog_keys.to_keep.push_back(ASAtomFromString("Metadata"));
-  catalog_keys.to_keep.push_back(ASAtomFromString("Pages"));
-  catalog_keys.to_keep.push_back(ASAtomFromString("StructTreeRoot"));
-  catalog_keys.to_keep.push_back(ASAtomFromString("Type"));
-  catalog_keys.to_keep.push_back(ASAtomFromString("ViewerPreferences"));
-
-  CosObjEnum(catalog, GetKeysEnumProc, &catalog_keys);
-
-  for (ASAtom key_to_remove : catalog_keys.to_remove)
-  {
-    CosDictRemove(catalog, key_to_remove);
-#ifdef _DEBUG
-    OutputDebugString("Removed: ");
-    OutputDebugString(ASAtomGetString(key_to_remove));
-    OutputDebugString("\n");
-#endif // _DEBUG
-  }
-}
-
-//*****************************************************************************
 bool DoOutputIntents(bool perform_fix) {
   //*Remove Output Intents entry (OutputIntents dictionary from catalog is removed if exists)
   CosObj catalog = CosDocGetRoot(PDDocGetCosDoc(AVDocGetPDDoc(AVAppGetActiveDoc())));
@@ -492,4 +440,56 @@ bool DoActualTextNullTerminator(bool perform_fix) {
     return ret_val;
   };
   return DoStructureElement(perform_fix, actuals);
+}
+
+//*****************************************************************************
+void CleanViewerPreferences() {
+  CosObj catalog = CosDocGetRoot(PDDocGetCosDoc(AVDocGetPDDoc(AVAppGetActiveDoc())));
+  CosObj vp = CosDictGet(catalog, ASAtomFromString("ViewerPreferences"));
+
+  if (CosObjEqual(vp, CosNewNull()))
+    return;
+
+  dictionary_keys viewer_preferences_keys;
+  viewer_preferences_keys.to_keep.push_back(ASAtomFromString("DisplayDocTitle"));
+
+  CosObjEnum(vp, GetKeysEnumProc, &viewer_preferences_keys);
+
+  for (ASAtom key_to_remove : viewer_preferences_keys.to_remove)
+  {
+    CosDictRemove(vp, key_to_remove);
+#ifdef _DEBUG
+    OutputDebugString("Removed: ");
+    OutputDebugString(ASAtomGetString(key_to_remove));
+    OutputDebugString("\n");
+#endif // _DEBUG
+  }
+}
+
+//*****************************************************************************
+void CleanDocumentCatalog() {
+  CosObj catalog = CosDocGetRoot(PDDocGetCosDoc(AVDocGetPDDoc(AVAppGetActiveDoc())));
+  if (CosObjEqual(catalog, CosNewNull()))
+    return;
+
+  dictionary_keys catalog_keys;
+  catalog_keys.to_keep.push_back(ASAtomFromString("Lang"));
+  catalog_keys.to_keep.push_back(ASAtomFromString("MarkInfo"));
+  catalog_keys.to_keep.push_back(ASAtomFromString("Metadata"));
+  catalog_keys.to_keep.push_back(ASAtomFromString("Pages"));
+  catalog_keys.to_keep.push_back(ASAtomFromString("StructTreeRoot"));
+  catalog_keys.to_keep.push_back(ASAtomFromString("Type"));
+  catalog_keys.to_keep.push_back(ASAtomFromString("ViewerPreferences"));
+
+  CosObjEnum(catalog, GetKeysEnumProc, &catalog_keys);
+
+  for (ASAtom key_to_remove : catalog_keys.to_remove)
+  {
+    CosDictRemove(catalog, key_to_remove);
+#ifdef _DEBUG
+    OutputDebugString("Removed: ");
+    OutputDebugString(ASAtomGetString(key_to_remove));
+    OutputDebugString("\n");
+#endif // _DEBUG
+  }
 }

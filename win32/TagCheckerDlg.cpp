@@ -16,6 +16,12 @@ const UINT fixIds[] =
   0
 };
 
+const UINT wipeIds[] =
+{
+  IDC_CHECK_WIPE_1, IDC_CHECK_WIPE_2,
+  0
+};
+
 // CTagCheckerDlg dialog
 
 IMPLEMENT_DYNAMIC(CTagCheckerDlg, CDialogEx)
@@ -40,6 +46,7 @@ BEGIN_MESSAGE_MAP(CTagCheckerDlg, CDialogEx)
   ON_BN_CLICKED(IDOK, &OnBnClickedOk)
   ON_BN_CLICKED(IDC_CHECK_FIX_ALL, &OnCheckFixAll)
   ON_CONTROL_RANGE(BN_CLICKED, IDC_CHECK_FIX_1_1, IDC_CHECK_FIX_1_2, &OnCheckFix)
+  ON_CONTROL_RANGE(BN_CLICKED, IDC_CHECK_WIPE_1, IDC_CHECK_WIPE_2, &OnCheckWipe)
 END_MESSAGE_MAP()
 
 
@@ -61,6 +68,14 @@ void CTagCheckerDlg::OnCheckFixAll()
       CheckDlgButton(*id, bFixAll);
     }
     SetOKBtnState();
+}
+
+void CTagCheckerDlg::OnCheckWipe(UINT nID)
+{
+  if (!IsInWipeIdsRange(nID))
+    return;
+
+  SetOKBtnState();
 }
 
 void CTagCheckerDlg::OnCheckFix(UINT nID)
@@ -90,6 +105,11 @@ void CTagCheckerDlg::OnBnClickedOk()
   DoExtensions(IsDlgButtonChecked(IDC_CHECK_FIX_2_11) == BST_CHECKED);
   DoPageLayout(IsDlgButtonChecked(IDC_CHECK_FIX_2_12) == BST_CHECKED);
   
+  if (IsDlgButtonChecked(IDC_CHECK_WIPE_1) == BST_CHECKED)
+    CleanDocumentCatalog();
+  if (IsDlgButtonChecked(IDC_CHECK_WIPE_2) == BST_CHECKED)
+    CleanViewerPreferences();
+
   CDialogEx::OnOK();
 }
 
@@ -150,40 +170,77 @@ BOOL CTagCheckerDlg::OnInitDialog()
 
 void CTagCheckerDlg::SetOKBtnState()
 {
-  BOOL bEnableOK = FALSE;
-  for (const UINT* id = fixIds; *id; ++id)
-  {
-    if (IsDlgButtonChecked(*id)) {
-      bEnableOK = TRUE;
-      break;
-    }
-  }
-  CButton* pButton = (CButton*)GetDlgItem(IDOK);
-  pButton->EnableWindow(bEnableOK);
+  BOOL isFixChecked = IsAnyIdChecked(fixIds);
+  BOOL isWipeChecked = IsAnyIdChecked(wipeIds);
+
+  CButton* pOKBtn = (CButton*)GetDlgItem(IDOK);
+  pOKBtn->EnableWindow(isFixChecked || isWipeChecked);
 }
 
-BOOL CTagCheckerDlg::IsFixEnabled()
+BOOL CTagCheckerDlg::IsAnyFixEnabled()
 {
   BOOL isEnabled = FALSE;
-  for (const UINT* id = fixIds; *id; ++id) {
-    CWnd* idWnd = GetDlgItem(*id);
-    if (idWnd->IsWindowEnabled())
+  for (const UINT* fixId = fixIds; *fixId; ++fixId) {
+    CWnd* idWnd = GetDlgItem(*fixId);
+    if (idWnd->IsWindowEnabled()) {
       isEnabled = TRUE;
+      break;
+    }
   }
   return isEnabled;
 }
 
-void CTagCheckerDlg::SetFixAllCheckBtnState()
+BOOL CTagCheckerDlg::IsAnyIdChecked(const UINT ids[])
 {
-  BOOL bCheckFixAll = TRUE;
-  for (const UINT* id = fixIds; *id; ++id) {
-    CWnd* idWnd = GetDlgItem(*id);
-    if (idWnd->IsWindowEnabled() && !IsDlgButtonChecked(*id)) {
-      bCheckFixAll = FALSE;
+  BOOL isChecked = FALSE;
+  for (const UINT* id = ids; *id; ++id) {
+    if (IsDlgButtonChecked(*id)) {
+      isChecked = TRUE;
       break;
     }
   }
-  CheckDlgButton(IDC_CHECK_FIX_ALL, bCheckFixAll);
+  return isChecked;
+}
+
+BOOL CTagCheckerDlg::IsAllFixesChecked()
+{
+  BOOL isChecked = TRUE;
+  for (const UINT* fixId = fixIds; *fixId; ++fixId) {
+    CWnd* idWnd = GetDlgItem(*fixId);
+    if (idWnd->IsWindowEnabled() && !IsDlgButtonChecked(*fixId)) {
+      isChecked = FALSE;
+      break;
+    }
+  }
+  return isChecked;
+}
+
+void CTagCheckerDlg::SetFixAllCheckBtnState()
+{
+  CButton* pCheckFixAllBtn = (CButton*)GetDlgItem(IDC_CHECK_FIX_ALL);
+
+  if (IsAllFixesChecked() && IsAnyFixEnabled())
+    pCheckFixAllBtn->SetCheck(TRUE);
+  else
+    pCheckFixAllBtn->SetCheck(FALSE);
+
+  if (IsAnyFixEnabled())
+    pCheckFixAllBtn->EnableWindow(TRUE);
+  else
+    pCheckFixAllBtn->EnableWindow(FALSE);
+
+}
+
+bool CTagCheckerDlg::IsInWipeIdsRange(UINT nID)
+{
+  bool isWipeId = false;
+  for (const UINT* id = wipeIds; *id; ++id) {
+    if (nID == *id) {
+      isWipeId = true;
+      break;
+    }
+  }
+  return isWipeId;
 }
 
 bool CTagCheckerDlg::IsInFixIdsRange(UINT nID)

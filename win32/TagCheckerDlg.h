@@ -26,10 +26,14 @@ public:
   afx_msg void OnBnClickedOk();
   afx_msg void OnCheckFixAll();
   afx_msg void OnCheckFix(UINT nID);
+  afx_msg void OnCheckWipe(UINT nID);
   virtual BOOL OnInitDialog();
 private:
   void SetOKBtnState();
-  BOOL IsFixEnabled();
+  BOOL IsAnyFixEnabled();
+  BOOL IsAnyIdChecked(const UINT ids[]);
+  BOOL IsAllFixesChecked();
   void SetFixAllCheckBtnState();
+  bool IsInWipeIdsRange(UINT nID);
   bool IsInFixIdsRange(UINT nID);
 };

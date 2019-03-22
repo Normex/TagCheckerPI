@@ -49,6 +49,9 @@
 #define IDC_CHECK_FOUND_1_2             1038
 #define IDC_CHECK_FIX_1_2               1039
 #define IDC_CHECK_FIX_ALL               1040
+#define IDC_CHECK_WIPE_1                1041
+#define IDC_CHECK_FIX_ALL3              1042
+#define IDC_CHECK_WIPE_2                1042
 
 // Next default values for new objects
 // 
