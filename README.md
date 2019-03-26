@@ -16,6 +16,7 @@ The current implementation is able to to perform following tasks:
 * Remove Extensions from the document catalog
 * Remove empty Page Layout
 * Remove the null terminator from Actual Text
+* Remove the null terminator from Alternate Text
 * Wipe the Document Catalog dictonary removing all entries except Lang, MarkInfo, Metadata, Pages, StructTreeRoot, Type, ViewerPreferences
 * Wipe the ViewerPreferences dictionary in the Document Catalog except DisplayDocTitle
 

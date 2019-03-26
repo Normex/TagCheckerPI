@@ -12,7 +12,7 @@ const UINT fixIds[] =
   IDC_CHECK_FIX_2_3,  IDC_CHECK_FIX_2_4,  IDC_CHECK_FIX_2_5,
   IDC_CHECK_FIX_2_6,  IDC_CHECK_FIX_2_7,  IDC_CHECK_FIX_2_8,
   IDC_CHECK_FIX_2_9,  IDC_CHECK_FIX_2_10, IDC_CHECK_FIX_2_11,
-  IDC_CHECK_FIX_2_12, IDC_CHECK_FIX_1_2,
+  IDC_CHECK_FIX_2_12, IDC_CHECK_FIX_1_2,  IDC_CHECK_FIX_1_3,
   0
 };
 
@@ -45,7 +45,7 @@ BEGIN_MESSAGE_MAP(CTagCheckerDlg, CDialogEx)
   ON_WM_ACTIVATE()
   ON_BN_CLICKED(IDOK, &OnBnClickedOk)
   ON_BN_CLICKED(IDC_CHECK_FIX_ALL, &OnCheckFixAll)
-  ON_CONTROL_RANGE(BN_CLICKED, IDC_CHECK_FIX_1_1, IDC_CHECK_FIX_1_2, &OnCheckFix)
+  ON_CONTROL_RANGE(BN_CLICKED, IDC_CHECK_FIX_1_1, IDC_CHECK_FIX_1_3, &OnCheckFix)
   ON_CONTROL_RANGE(BN_CLICKED, IDC_CHECK_WIPE_1, IDC_CHECK_WIPE_2, &OnCheckWipe)
 END_MESSAGE_MAP()
 
@@ -91,6 +91,7 @@ void CTagCheckerDlg::OnBnClickedOk()
 {
   DoAllignSEWithMC(IsDlgButtonChecked(IDC_CHECK_FIX_1_1) == BST_CHECKED);
   DoActualTextNullTerminator(IsDlgButtonChecked(IDC_CHECK_FIX_1_2) == BST_CHECKED);
+  DoAlternateTextNullTerminator(IsDlgButtonChecked(IDC_CHECK_FIX_1_3) == BST_CHECKED);
 
   DoClassMap(IsDlgButtonChecked(IDC_CHECK_FIX_2_1) == BST_CHECKED);
   DoRoleMap(IsDlgButtonChecked(IDC_CHECK_FIX_2_2) == BST_CHECKED);
@@ -119,6 +120,7 @@ BOOL CTagCheckerDlg::OnInitDialog()
 
   CheckDlgButton(IDC_CHECK_FOUND_1_1, DoAllignSEWithMC());
   CheckDlgButton(IDC_CHECK_FOUND_1_2, DoActualTextNullTerminator());
+  CheckDlgButton(IDC_CHECK_FOUND_1_3, DoAlternateTextNullTerminator());
   CheckDlgButton(IDC_CHECK_FOUND_2_1, DoClassMap());
   CheckDlgButton(IDC_CHECK_FOUND_2_2, DoRoleMap());
   CheckDlgButton(IDC_CHECK_FOUND_2_3, DoIDTree());
