@@ -45,8 +45,10 @@ BEGIN_MESSAGE_MAP(CTagCheckerDlg, CDialogEx)
   ON_WM_ACTIVATE()
   ON_BN_CLICKED(IDOK, &OnBnClickedOk)
   ON_BN_CLICKED(IDC_CHECK_FIX_ALL, &OnCheckFixAll)
+  // these ranges cannot overlap in resource.h
   ON_CONTROL_RANGE(BN_CLICKED, IDC_CHECK_FIX_1_1, IDC_CHECK_FIX_1_3, &OnCheckFix)
   ON_CONTROL_RANGE(BN_CLICKED, IDC_CHECK_WIPE_1, IDC_CHECK_WIPE_2, &OnCheckWipe)
+  // END these ranges cannot overlap
 END_MESSAGE_MAP()
 
 
