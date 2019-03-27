@@ -140,6 +140,8 @@ BOOL CTagCheckerDlg::OnInitDialog()
   pBtn->EnableWindow(IsDlgButtonChecked(IDC_CHECK_FOUND_1_1));
   pBtn = (CButton*)GetDlgItem(IDC_CHECK_FIX_1_2);
   pBtn->EnableWindow(IsDlgButtonChecked(IDC_CHECK_FOUND_1_2));
+  pBtn = (CButton*)GetDlgItem(IDC_CHECK_FIX_1_3);
+  pBtn->EnableWindow(IsDlgButtonChecked(IDC_CHECK_FOUND_1_3));
   pBtn = (CButton*)GetDlgItem(IDC_CHECK_FIX_2_1);
   pBtn->EnableWindow(IsDlgButtonChecked(IDC_CHECK_FOUND_2_1));
   pBtn = (CButton*)GetDlgItem(IDC_CHECK_FIX_2_2);
