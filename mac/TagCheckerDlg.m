@@ -75,6 +75,12 @@ TagCheckerDlg *gTagCheckerDlg = NULL;
     DoOutlines( [Fix_2_10 state]);
     DoExtensions( [Fix_2_11 state]);
     DoPageLayout( [Fix_2_12 state]);
+    
+    if ([Wipe_1 state])
+        CleanDocumentCatalog();
+    if ([Wipe_2 state])
+        CleanViewerPreferences();
+    
     [NSApp stopModalWithCode:1];
 }
 

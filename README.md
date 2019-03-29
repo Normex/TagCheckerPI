@@ -37,7 +37,8 @@ Keep in mind that this is not a tool for professional usage. We can't guarantee 
 # Documentation
 
 ## Screenshot
-![alt text](https://github.com/Normex/TagCheckerPI/blob/master/tagchecker.png "TagChecker")
+![alt text](https://github.com/Normex/TagCheckerPI/blob/master/tagchecker.png "TagChecker Windows")
+![alt text](https://github.com/Normex/TagCheckerPI/blob/master/tagchecker_mac.png "TagChecker Mac")
 
 The dialog is accessible only on active document from Adobe Acrobat menu Plug-ins -> Tag Checker. Plug in checks all the tasks and indicates with check in the first column if the fix is possible or needed. You then select which tasks you want to run by selecting them in second column. Click OK to perfom fixes and close the dialog. You do this repeatedly. Don't forget to save (or save as) the file.
 

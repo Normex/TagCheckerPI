@@ -34,6 +34,8 @@
     IBOutlet NSButton *Fix_2_10;
     IBOutlet NSButton *Fix_2_11;
     IBOutlet NSButton *Fix_2_12;
+    IBOutlet NSButton *Wipe_1;
+    IBOutlet NSButton *Wipe_2;
 }
 
 - (int) showWindow;

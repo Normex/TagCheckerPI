@@ -502,11 +502,13 @@ void CleanViewerPreferences() {
   for (ASAtom key_to_remove : viewer_preferences_keys.to_remove)
   {
     CosDictRemove(vp, key_to_remove);
+#ifndef MAC_PLATFORM
 #ifdef DEBUG
     char msgbuf[256];
     sprintf_s(msgbuf, sizeof(msgbuf), "Removed from ViewerPreferences: %s\n", ASAtomGetString(key_to_remove));
     OutputDebugString(msgbuf);
 #endif // DEBUG
+#endif
   }
 }
 
@@ -532,10 +534,12 @@ void CleanDocumentCatalog() {
   for (ASAtom key_to_remove : catalog_keys.to_remove)
   {
     CosDictRemove(catalog, key_to_remove);
+#ifndef MAC_PLATFORM
 #ifdef _DEBUG
     char msgbuf[256];
     sprintf_s(msgbuf, sizeof(msgbuf), "Removed from Catalog: %s\n", ASAtomGetString(key_to_remove));
     OutputDebugString(msgbuf);
 #endif // _DEBUG
+#endif
   }
 }
