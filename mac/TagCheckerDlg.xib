@@ -8,6 +8,34 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="TagCheckerDlg">
             <connections>
+                <outlet property="Fix_1_1" destination="iCe-NQ-yIp" id="mAB-fe-1Ys"/>
+                <outlet property="Fix_1_2" destination="TV0-to-I4J" id="JxS-dy-HoV"/>
+                <outlet property="Fix_2_1" destination="qAy-nf-A4I" id="zJA-Yd-Vie"/>
+                <outlet property="Fix_2_10" destination="6Nw-za-Hy8" id="CMy-cn-BPs"/>
+                <outlet property="Fix_2_11" destination="8tX-sy-zDF" id="ikx-GX-dzh"/>
+                <outlet property="Fix_2_12" destination="j9K-ex-0Ug" id="tXc-jj-1t2"/>
+                <outlet property="Fix_2_2" destination="PNf-Ay-paK" id="F31-x6-DmZ"/>
+                <outlet property="Fix_2_3" destination="N5c-KO-IqP" id="i7j-3k-vi4"/>
+                <outlet property="Fix_2_4" destination="VZg-ZU-WG9" id="Y89-y0-2TG"/>
+                <outlet property="Fix_2_5" destination="f7P-hd-qWf" id="NUB-gx-WW7"/>
+                <outlet property="Fix_2_6" destination="eoa-0Y-Tdt" id="S22-ut-6MI"/>
+                <outlet property="Fix_2_7" destination="NxH-pt-NbE" id="LhU-Jx-338"/>
+                <outlet property="Fix_2_8" destination="8JE-jC-leP" id="9bQ-c1-5qT"/>
+                <outlet property="Fix_2_9" destination="S3R-JZ-Go2" id="JdH-ci-AhN"/>
+                <outlet property="Found_1_1" destination="y9M-cK-B81" id="NyY-4T-GrI"/>
+                <outlet property="Found_1_2" destination="asw-mv-vQ8" id="B5f-BM-c5s"/>
+                <outlet property="Found_2_1" destination="VmT-o6-q53" id="DsU-5T-J9R"/>
+                <outlet property="Found_2_10" destination="b5h-Xk-s3a" id="u1B-Bx-c9I"/>
+                <outlet property="Found_2_11" destination="6Eb-qy-Aji" id="hH4-8J-ysg"/>
+                <outlet property="Found_2_12" destination="cyn-pr-ZxQ" id="UbX-Kr-4aR"/>
+                <outlet property="Found_2_2" destination="jLd-0o-7zb" id="etZ-El-2o9"/>
+                <outlet property="Found_2_3" destination="WZz-Dk-Crr" id="ltx-eX-ilq"/>
+                <outlet property="Found_2_4" destination="NDq-A4-EnU" id="Az9-us-xjt"/>
+                <outlet property="Found_2_5" destination="ilE-Te-p9S" id="Fvw-T3-uWp"/>
+                <outlet property="Found_2_6" destination="UDG-aC-Usn" id="IP6-1K-OAJ"/>
+                <outlet property="Found_2_7" destination="ZDd-g9-viX" id="fLa-gV-QVF"/>
+                <outlet property="Found_2_8" destination="JZo-xk-xmz" id="gFx-Bj-cDe"/>
+                <outlet property="Found_2_9" destination="JQX-zk-Gy4" id="ndB-nL-1Ti"/>
                 <outlet property="TagCheckerWindow" destination="QvC-M9-y7g" id="g5g-5f-8DO"/>
                 <outlet property="Wipe_1" destination="Jgx-on-Id6" id="rDL-UZ-eZW"/>
                 <outlet property="Wipe_2" destination="tRY-nk-RRB" id="Liw-Ps-eGt"/>
