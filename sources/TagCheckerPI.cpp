@@ -55,27 +55,27 @@ bool DoStructureElement(PDDoc pd_doc, PDSElement element, bool perform_fix, Proc
   //sprintf(buf, "SE: %s ", ASAtomGetString(PDSElementGetType(element)));
 
   bool to_ret = false;
-  for (ASInt32 kid_index = 0; kid_index < num_kids; ++kid_index) {
-    CosObj kid;
-    PDSMCInfo mcid_info;
-    PDSMC marked_content;
+    for (ASInt32 kid_index = 0; kid_index < num_kids; ++kid_index) {
+      CosObj kid;
+      PDSMCInfo mcid_info;
+      PDSMC marked_content;
 
-    //Get the kid info
-    ASAtom kid_type = PDSElementGetKidWithMCInfo(element,  //The PDSElement containing the kid that is retrieved
-      kid_index, //The index of the kid.
-      &kid,     //The kid being accessed (depending on the kid's type) or NULL.
-      &mcid_info,//The kid's information object or NULL.
-      (void**)&marked_content,     //Pointer to the kid or NULL.
-      NULL);    //The CosObj of the page containing the kid or NULL
+      //Get the kid info
+      ASAtom kid_type = PDSElementGetKidWithMCInfo(element,  //The PDSElement containing the kid that is retrieved
+        kid_index, //The index of the kid.
+        &kid,     //The kid being accessed (depending on the kid's type) or NULL.
+        &mcid_info,//The kid's information object or NULL.
+        (void**)&marked_content,     //Pointer to the kid or NULL.
+        NULL);    //The CosObj of the page containing the kid or NULL
 
-    // calls callback that performs the check or the fix
-    if (callback(perform_fix, element, kid_type, kid, mcid_info, marked_content))
-      return true;
+      // calls callback that performs the check or the fix
+      if (callback(perform_fix, element, kid_type, kid, mcid_info, marked_content))
+        return true;
 
-    if (kid_type == ASAtomFromString("StructElem")) {
-      to_ret = to_ret || DoStructureElement(pd_doc, kid, perform_fix, callback);
+      if (kid_type == ASAtomFromString("StructElem")) {
+        to_ret = to_ret || DoStructureElement(pd_doc, kid, perform_fix, callback);
     };
-  }
+      }
   return to_ret;
 }
 
@@ -95,7 +95,7 @@ bool DoStructureElement(bool perform_fix, ProcessStructureElementFunction callba
       if (callback(perform_fix, CosNewNull(), ASAtomFromString("StructElem"), elem, PDSMCInfo(), NULL))
         return true;
       to_ret = to_ret || DoStructureElement(pd_doc, elem, perform_fix, callback);
-    }
+  }
   }
   return to_ret;
 }
@@ -161,8 +161,6 @@ bool DoClassMap(bool perform_fix) {
   PDSClassMap class_map;
   if (!PDSTreeRootGetClassMap(pds_tree_root, &class_map))
     return false;
-  if (CosObjEqual(class_map, CosNewNull()))
-    return false;
 
   if (CosObjEnum(class_map, MyCosDictEnumProc, NULL))
     if (!perform_fix) return true; //stop processing the tree
@@ -172,7 +170,19 @@ bool DoClassMap(bool perform_fix) {
 }
 
 //*****************************************************************************
-bool DoRoleMap(bool perform_fix) {
+bool HasRoleMap() {
+  PDDoc pd_doc = AVDocGetPDDoc(AVAppGetActiveDoc());
+  PDSTreeRoot pds_tree_root;
+  if (!PDDocGetStructTreeRoot(pd_doc, &pds_tree_root))
+    return false;
+  PDSRoleMap role_map;
+  if (PDSTreeRootGetRoleMap(pds_tree_root, &role_map))
+    return true;
+  return false;
+}
+
+//*****************************************************************************
+bool DoEmptyRoleMap(bool perform_fix) {
   PDDoc pd_doc = AVDocGetPDDoc(AVAppGetActiveDoc());
   PDSTreeRoot pds_tree_root = CosNewNull();
   if (!PDDocGetStructTreeRoot(pd_doc, &pds_tree_root))
@@ -180,14 +190,43 @@ bool DoRoleMap(bool perform_fix) {
   PDSRoleMap role_map;
   if (!PDSTreeRootGetRoleMap(pds_tree_root, &role_map))
     return false;
-  if (CosObjEqual(role_map, CosNewNull()))
-    return false;
 
   if (CosObjEnum(role_map, MyCosDictEnumProc, NULL))
     if (!perform_fix) return true; //stop processing the tree
     else PDSTreeRootRemoveRoleMap(pds_tree_root);
 
   return false;
+}
+
+//*****************************************************************************
+bool DoUsedRoleMap(bool perform_fix) {
+  ProcessStructureElementFunction roleMapUsage = [](bool perform_fix, PDSElement element,
+    ASAtom kid_type, CosObj kid, PDSMCInfo mcid_info, PDSMC marked_content)
+  {
+    if (kid_type != ASAtomFromString("StructElem"))
+      return false;
+
+    PDDoc pd_doc = AVDocGetPDDoc(AVAppGetActiveDoc());
+    PDSTreeRoot pds_tree_root = CosNewNull();
+    if (!PDDocGetStructTreeRoot(pd_doc, &pds_tree_root))
+      return false;
+    PDSRoleMap role_map;
+    if (!PDSTreeRootGetRoleMap(pds_tree_root, &role_map))
+      return false;
+
+    if (CosObjEnum(role_map, MyCosDictEnumProc, NULL)) //is empty
+      return false;
+
+    ASAtom standart_type = PDSRoleMapGetDirectMap(role_map, PDSElementGetType(kid));
+    if (standart_type != ASAtomNull) //found in RoleMap
+        return true;
+    else
+      if (perform_fix)
+        PDSTreeRootRemoveRoleMap(pds_tree_root);
+
+    return false;
+  };
+  return DoStructureElement(perform_fix, roleMapUsage);
 }
 
 //*****************************************************************************

@@ -96,7 +96,8 @@ void CTagCheckerDlg::OnBnClickedOk()
   DoAlternateTextNullTerminator(IsDlgButtonChecked(IDC_CHECK_FIX_1_3) == BST_CHECKED);
 
   DoClassMap(IsDlgButtonChecked(IDC_CHECK_FIX_2_1) == BST_CHECKED);
-  DoRoleMap(IsDlgButtonChecked(IDC_CHECK_FIX_2_2) == BST_CHECKED);
+  DoEmptyRoleMap(IsDlgButtonChecked(IDC_CHECK_FIX_2_2) == BST_CHECKED);
+  DoUsedRoleMap(IsDlgButtonChecked(IDC_CHECK_FIX_2_2) == BST_CHECKED);
   DoIDTree(IsDlgButtonChecked(IDC_CHECK_FIX_2_3) == BST_CHECKED);
   DoAttributes(IsDlgButtonChecked(IDC_CHECK_FIX_2_4) == BST_CHECKED);
   DoTitleEntries(IsDlgButtonChecked(IDC_CHECK_FIX_2_5) == BST_CHECKED);
@@ -124,7 +125,7 @@ BOOL CTagCheckerDlg::OnInitDialog()
   CheckDlgButton(IDC_CHECK_FOUND_1_2, DoActualTextNullTerminator());
   CheckDlgButton(IDC_CHECK_FOUND_1_3, DoAlternateTextNullTerminator());
   CheckDlgButton(IDC_CHECK_FOUND_2_1, DoClassMap());
-  CheckDlgButton(IDC_CHECK_FOUND_2_2, DoRoleMap());
+  CheckDlgButton(IDC_CHECK_FOUND_2_2, DoEmptyRoleMap() || (HasRoleMap() && !DoUsedRoleMap()));
   CheckDlgButton(IDC_CHECK_FOUND_2_3, DoIDTree());
   CheckDlgButton(IDC_CHECK_FOUND_2_4, DoAttributes());
   CheckDlgButton(IDC_CHECK_FOUND_2_5, DoTitleEntries());

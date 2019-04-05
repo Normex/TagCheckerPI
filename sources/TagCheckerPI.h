@@ -10,7 +10,9 @@
 //  otherwise it should return false (means if perform_fix == true always return false)
 bool DoAllignSEWithMC(bool perform_fix = false);
 bool DoClassMap(bool perform_fix = false);
-bool DoRoleMap(bool perform_fix = false);
+bool HasRoleMap();
+bool DoEmptyRoleMap(bool perform_fix = false);
+bool DoUsedRoleMap(bool perform_fix = false);
 bool DoIDTree(bool perform_fix = false);
 bool DoAttributes(bool perform_fix = false);
 bool DoTitleEntries(bool perform_fix = false);
