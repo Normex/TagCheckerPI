@@ -8,6 +8,7 @@
     IBOutlet NSWindow *TagCheckerWindow;
     IBOutlet NSButton *Found_1_1;
     IBOutlet NSButton *Found_1_2;
+    IBOutlet NSButton *Found_1_3;
     IBOutlet NSButton *Found_2_1;
     IBOutlet NSButton *Found_2_2;
     IBOutlet NSButton *Found_2_3;
@@ -22,6 +23,7 @@
     IBOutlet NSButton *Found_2_12;
     IBOutlet NSButton *Fix_1_1;
     IBOutlet NSButton *Fix_1_2;
+    IBOutlet NSButton *Fix_1_3;
     IBOutlet NSButton *Fix_2_1;
     IBOutlet NSButton *Fix_2_2;
     IBOutlet NSButton *Fix_2_3;

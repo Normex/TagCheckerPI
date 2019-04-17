@@ -21,8 +21,9 @@ TagCheckerDlg *gTagCheckerDlg = NULL;
    
     [Found_1_1 setState: DoAllignSEWithMC()];
     [Found_1_2 setState: DoActualTextNullTerminator()];
+    [Found_1_3 setState: DoAlternateTextNullTerminator()];
     [Found_2_1 setState: DoClassMap()];
-    [Found_2_2 setState: DoRoleMap()];
+    [Found_2_2 setState: DoEmptyRoleMap() || (HasRoleMap() && !DoUsedRoleMap())];
     [Found_2_3 setState: DoIDTree()];
     [Found_2_4 setState: DoAttributes()];
     [Found_2_5 setState: DoTitleEntries()];
@@ -36,6 +37,7 @@ TagCheckerDlg *gTagCheckerDlg = NULL;
     
     [Fix_1_1 setEnabled: [Found_1_1 state]];
     [Fix_1_2 setEnabled: [Found_1_2 state]];
+    [Fix_1_3 setEnabled: [Found_1_3 state]];
     [Fix_2_1 setEnabled: [Found_2_1 state]];
     [Fix_2_2 setEnabled: [Found_2_2 state]];
     [Fix_2_3 setEnabled: [Found_2_3 state]];
@@ -62,9 +64,11 @@ TagCheckerDlg *gTagCheckerDlg = NULL;
 - (IBAction)okPressed:(id)sender {
     DoAllignSEWithMC( [Fix_1_1 state]);
     DoActualTextNullTerminator( [Fix_1_2 state]);
-    
+    DoAlternateTextNullTerminator( [Fix_1_3 state]);
+
     DoClassMap( [Fix_2_1 state]);
-    DoRoleMap( [Fix_2_2 state]);
+    DoEmptyRoleMap( [Fix_2_2 state]);
+    DoUsedRoleMap( [Fix_2_2 state]);
     DoIDTree( [Fix_2_3 state]);
     DoAttributes( [Fix_2_4 state]);
     DoTitleEntries( [Fix_2_5 state]);

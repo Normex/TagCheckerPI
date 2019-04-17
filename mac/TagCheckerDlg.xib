@@ -10,6 +10,7 @@
             <connections>
                 <outlet property="Fix_1_1" destination="iCe-NQ-yIp" id="mAB-fe-1Ys"/>
                 <outlet property="Fix_1_2" destination="TV0-to-I4J" id="JxS-dy-HoV"/>
+                <outlet property="Fix_1_3" destination="Lux-aQ-xYZ" id="HW5-W9-TEi"/>
                 <outlet property="Fix_2_1" destination="qAy-nf-A4I" id="zJA-Yd-Vie"/>
                 <outlet property="Fix_2_10" destination="6Nw-za-Hy8" id="CMy-cn-BPs"/>
                 <outlet property="Fix_2_11" destination="8tX-sy-zDF" id="ikx-GX-dzh"/>
@@ -24,6 +25,7 @@
                 <outlet property="Fix_2_9" destination="S3R-JZ-Go2" id="JdH-ci-AhN"/>
                 <outlet property="Found_1_1" destination="y9M-cK-B81" id="NyY-4T-GrI"/>
                 <outlet property="Found_1_2" destination="asw-mv-vQ8" id="B5f-BM-c5s"/>
+                <outlet property="Found_1_3" destination="9eV-Kq-eJ9" id="Dnj-sE-c20"/>
                 <outlet property="Found_2_1" destination="VmT-o6-q53" id="DsU-5T-J9R"/>
                 <outlet property="Found_2_10" destination="b5h-Xk-s3a" id="u1B-Bx-c9I"/>
                 <outlet property="Found_2_11" destination="6Eb-qy-Aji" id="hH4-8J-ysg"/>
@@ -46,10 +48,10 @@
         <window title="Tag Checker" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" animationBehavior="default" id="QvC-M9-y7g">
             <windowStyleMask key="styleMask" titled="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="426" y="286" width="393" height="495"/>
+            <rect key="contentRect" x="426" y="286" width="393" height="526"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1027"/>
             <view key="contentView" id="EiT-Mj-1SZ">
-                <rect key="frame" x="0.0" y="0.0" width="393" height="495"/>
+                <rect key="frame" x="0.0" y="0.0" width="393" height="526"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tEA-0F-Ifa">
@@ -67,7 +69,7 @@ DQ
                         </buttonCell>
                     </button>
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="O4t-sO-Uax">
-                        <rect key="frame" x="9" y="446" width="374" height="40"/>
+                        <rect key="frame" x="9" y="481" width="374" height="40"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <textFieldCell key="cell" selectable="YES" title="The plug-in for developing PDF Techniques for Accessibility see: https://github.com/Normex/TagCheckerPI " id="n0Q-tz-y35">
                             <font key="font" metaFont="system"/>
@@ -76,7 +78,7 @@ DQ
                         </textFieldCell>
                     </textField>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="CHI-hZ-zUR">
-                        <rect key="frame" x="9" y="412" width="237" height="17"/>
+                        <rect key="frame" x="9" y="447" width="237" height="17"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <textFieldCell key="cell" lineBreakMode="clipping" title="SE not aligned with Tag" id="eiL-SD-PSz">
                             <font key="font" metaFont="system"/>
@@ -85,7 +87,7 @@ DQ
                         </textFieldCell>
                     </textField>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="J9G-v4-V92">
-                        <rect key="frame" x="9" y="393" width="237" height="17"/>
+                        <rect key="frame" x="9" y="428" width="237" height="17"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <textFieldCell key="cell" lineBreakMode="clipping" title="Actual Text Null Terminator" id="tFW-2D-C0T">
                             <font key="font" metaFont="system"/>
@@ -94,7 +96,7 @@ DQ
                         </textFieldCell>
                     </textField>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="kZL-T5-7bi">
-                        <rect key="frame" x="336" y="429" width="22" height="17"/>
+                        <rect key="frame" x="336" y="464" width="22" height="17"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <textFieldCell key="cell" lineBreakMode="clipping" title="Fix" id="MmN-Vp-ire">
                             <font key="font" metaFont="system"/>
@@ -103,7 +105,7 @@ DQ
                         </textFieldCell>
                     </textField>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6oD-1a-1bE">
-                        <rect key="frame" x="256" y="429" width="42" height="17"/>
+                        <rect key="frame" x="256" y="464" width="42" height="17"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <textFieldCell key="cell" lineBreakMode="clipping" title="Found" id="Q9d-Rx-Cmm">
                             <font key="font" metaFont="system"/>
@@ -114,7 +116,7 @@ DQ
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="UOW-xy-3UQ">
                         <rect key="frame" x="9" y="322" width="237" height="17"/>
                         <autoresizingMask key="autoresizingMask"/>
-                        <textFieldCell key="cell" lineBreakMode="clipping" title="Empty Role Map" id="NOY-hq-hHe">
+                        <textFieldCell key="cell" lineBreakMode="clipping" title="Empty or Unused Role Map" id="NOY-hq-hHe">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -238,7 +240,7 @@ DQ
                         </textFieldCell>
                     </textField>
                     <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="y9M-cK-B81">
-                        <rect key="frame" x="268" y="410" width="22" height="18"/>
+                        <rect key="frame" x="268" y="445" width="22" height="18"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="left" enabled="NO" state="on" inset="2" id="Zou-HM-xBn">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -246,7 +248,7 @@ DQ
                         </buttonCell>
                     </button>
                     <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="asw-mv-vQ8">
-                        <rect key="frame" x="268" y="391" width="22" height="18"/>
+                        <rect key="frame" x="268" y="426" width="22" height="18"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="left" enabled="NO" state="on" inset="2" id="4zU-Wx-jkk">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -254,7 +256,7 @@ DQ
                         </buttonCell>
                     </button>
                     <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="iCe-NQ-yIp">
-                        <rect key="frame" x="336" y="410" width="22" height="18"/>
+                        <rect key="frame" x="336" y="445" width="22" height="18"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="left" inset="2" id="FM6-OD-Ije">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -262,7 +264,7 @@ DQ
                         </buttonCell>
                     </button>
                     <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TV0-to-I4J">
-                        <rect key="frame" x="336" y="391" width="22" height="18"/>
+                        <rect key="frame" x="336" y="426" width="22" height="18"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="left" inset="2" id="Mod-3U-Orb">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -518,9 +520,34 @@ Gw
                             <font key="font" metaFont="system"/>
                         </buttonCell>
                     </button>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="z4u-Dx-bRS">
+                        <rect key="frame" x="9" y="409" width="237" height="17"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <textFieldCell key="cell" lineBreakMode="clipping" title="Alternate Text Null Terminator" id="lGr-20-khZ">
+                            <font key="font" metaFont="system"/>
+                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="9eV-Kq-eJ9">
+                        <rect key="frame" x="268" y="407" width="22" height="18"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="left" enabled="NO" state="on" inset="2" id="nAi-EU-x3a">
+                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                    </button>
+                    <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Lux-aQ-xYZ">
+                        <rect key="frame" x="336" y="407" width="22" height="18"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="left" inset="2" id="RSL-3s-0eo">
+                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                    </button>
                 </subviews>
             </view>
-            <point key="canvasLocation" x="-202.5" y="-471.5"/>
+            <point key="canvasLocation" x="-203.5" y="-549"/>
         </window>
         <collectionViewItem id="YUp-T7-n6f"/>
     </objects>
