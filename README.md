@@ -4,7 +4,7 @@ Plug-in for Adobe Acrobat. Checking and fixing pdf files for the purpose of PDF 
 The current implementation is able to to perform following tasks:
 * Align Strucuture Elements with Container types (checks every structure element that is associated with content object and changes the marked content container tag to match structure element type)
 * Remove empty Class Map (only removes ClassMap entry if it is empty. If there are entries in it, we don't touch it)
-* Remove empty Role Map (only removes RoleMap entry if it is empty. If there are entries in it, we don't touch it)
+* Remove empty or unused Role Map (removes RoleMap entry if it is empty or if any of it's entries are used)
 * Remove empty Attributes on Structure Elements (removes "A" entry from every structure element only if the "A" dictionary is empty)
 * Remove empty Title on Structure Elements (removes "T" entry from every structure element only if the "T" is an empty string)
 * Remove empty ID on Structure Elements (removes "ID" entry from every structure element only if the "ID" is an empty string)
