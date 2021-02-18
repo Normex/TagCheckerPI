@@ -25,6 +25,9 @@ bool DoPageLayout(bool perform_fix = false);
 bool DoRedundantLangAttribute(bool perform_fix = false);
 bool DoActualTextNullTerminator(bool perform_fix = false);
 bool DoAlternateTextNullTerminator(bool perform_fix = false);
+bool HasArtifactNestedContainer(bool perform_fix = false);
+bool HasContainerOtherThanMCIDEntry(bool perform_fix = false);
+
 void CleanViewerPreferences();
 void CleanDocumentCatalog();
 

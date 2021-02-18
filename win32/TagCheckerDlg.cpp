@@ -13,6 +13,7 @@ const UINT fixIds[] =
   IDC_CHECK_FIX_2_6,  IDC_CHECK_FIX_2_7,  IDC_CHECK_FIX_2_8,
   IDC_CHECK_FIX_2_9,  IDC_CHECK_FIX_2_10, IDC_CHECK_FIX_2_11,
   IDC_CHECK_FIX_2_12, IDC_CHECK_FIX_1_2,  IDC_CHECK_FIX_1_3,
+  IDC_CHECK_FIX_2_13, IDC_CHECK_FIX_2_14,
   0
 };
 
@@ -46,7 +47,7 @@ BEGIN_MESSAGE_MAP(CTagCheckerDlg, CDialogEx)
   ON_BN_CLICKED(IDOK, &OnBnClickedOk)
   ON_BN_CLICKED(IDC_CHECK_FIX_ALL, &OnCheckFixAll)
   // these ranges cannot overlap in resource.h
-  ON_CONTROL_RANGE(BN_CLICKED, IDC_CHECK_FIX_1_1, IDC_CHECK_FIX_1_3, &OnCheckFix)
+  ON_CONTROL_RANGE(BN_CLICKED, IDC_CHECK_FIX_1_1, IDC_CHECK_FIX_2_14, &OnCheckFix)
   ON_CONTROL_RANGE(BN_CLICKED, IDC_CHECK_WIPE_1, IDC_CHECK_WIPE_2, &OnCheckWipe)
   // END these ranges cannot overlap
 END_MESSAGE_MAP()
@@ -108,6 +109,8 @@ void CTagCheckerDlg::OnBnClickedOk()
   DoOutlines(IsDlgButtonChecked(IDC_CHECK_FIX_2_10) == BST_CHECKED);
   DoExtensions(IsDlgButtonChecked(IDC_CHECK_FIX_2_11) == BST_CHECKED);
   DoPageLayout(IsDlgButtonChecked(IDC_CHECK_FIX_2_12) == BST_CHECKED);
+  HasArtifactNestedContainer(IsDlgButtonChecked(IDC_CHECK_FIX_2_13) == BST_CHECKED);
+  HasContainerOtherThanMCIDEntry(IsDlgButtonChecked(IDC_CHECK_FIX_2_14) == BST_CHECKED);
   
   if (IsDlgButtonChecked(IDC_CHECK_WIPE_1) == BST_CHECKED)
     CleanDocumentCatalog();
@@ -120,7 +123,6 @@ void CTagCheckerDlg::OnBnClickedOk()
 BOOL CTagCheckerDlg::OnInitDialog()
 {
   CDialogEx::OnInitDialog();
-
   CheckDlgButton(IDC_CHECK_FOUND_1_1, DoAllignSEWithMC());
   CheckDlgButton(IDC_CHECK_FOUND_1_2, DoActualTextNullTerminator());
   CheckDlgButton(IDC_CHECK_FOUND_1_3, DoAlternateTextNullTerminator());
@@ -136,6 +138,8 @@ BOOL CTagCheckerDlg::OnInitDialog()
   CheckDlgButton(IDC_CHECK_FOUND_2_10, DoOutlines());
   CheckDlgButton(IDC_CHECK_FOUND_2_11, DoExtensions());
   CheckDlgButton(IDC_CHECK_FOUND_2_12, DoPageLayout());
+  CheckDlgButton(IDC_CHECK_FOUND_2_13, HasArtifactNestedContainer());
+  CheckDlgButton(IDC_CHECK_FOUND_2_14, HasContainerOtherThanMCIDEntry());
 
   CButton* pBtn = (CButton*)GetDlgItem(IDC_CHECK_FIX_1_1);
   pBtn->EnableWindow(IsDlgButtonChecked(IDC_CHECK_FOUND_1_1));
@@ -167,6 +171,10 @@ BOOL CTagCheckerDlg::OnInitDialog()
   pBtn->EnableWindow(IsDlgButtonChecked(IDC_CHECK_FOUND_2_11));
   pBtn = (CButton*)GetDlgItem(IDC_CHECK_FIX_2_12);
   pBtn->EnableWindow(IsDlgButtonChecked(IDC_CHECK_FOUND_2_12));
+  pBtn = (CButton*)GetDlgItem(IDC_CHECK_FIX_2_13);
+  pBtn->EnableWindow(IsDlgButtonChecked(IDC_CHECK_FOUND_2_13));
+  pBtn = (CButton*)GetDlgItem(IDC_CHECK_FIX_2_14);
+  pBtn->EnableWindow(IsDlgButtonChecked(IDC_CHECK_FOUND_2_14));
 
   SetOKBtnState();
   SetFixAllCheckBtnState();
