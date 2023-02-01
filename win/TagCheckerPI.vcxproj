@@ -250,7 +250,7 @@
       <BrowseInformation>true</BrowseInformation>
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
       <PreprocessorDefinitions>_DEBUG;WIN_PLATFORM;_WINDOWS;WIN_ENV;ACRO_SDK_LEVEL=0x000A0000;PI_ACROCOLOR_VERSION=0x00060000;PDMETADATA_HFT=1;PLUGIN=1;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>

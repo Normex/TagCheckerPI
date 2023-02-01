@@ -18,9 +18,10 @@ typedef std::function<bool(
   bool perform_fix,
   PDSElement element,
   ASAtom kid_type,
+  int kid_index,
   CosObj kid,
-  PDSMCInfo mcid_info,
-  PDSMC marked_content)> ProcessStructureElementFunction;
+  PDSMCInfo mcid_info/*,
+  PDSMC marked_content*/)> ProcessStructureElementFunction;
 
 //*****************************************************************************
 // callback to check if Dictionary is empty
@@ -61,25 +62,27 @@ bool DoStructureElement(PDDoc pd_doc, PDSElement element, bool perform_fix, Proc
   // recursively going through StructElem kids
   ASInt32 num_kids = PDSElementGetNumKids(element);
   // -- debug
-  //char buf[1024];
-  //sprintf(buf, "SE: %s ", ASAtomGetString(PDSElementGetType(element)));
+  char buf[1024];
+  char buf2[1024];
+  sprintf(buf, "SE: %s ", ASAtomGetString(PDSElementGetType(element)));
+  PDSElementGetTitle(element, (ASUns8*)buf2);
 
   bool to_ret = false;
   for (ASInt32 kid_index = 0; kid_index < num_kids; ++kid_index) {
     CosObj kid;
     PDSMCInfo mcid_info;
-    PDSMC marked_content;
+    //PDSMC marked_content;
 
     //Get the kid info
     ASAtom kid_type = PDSElementGetKidWithMCInfo(element,  //The PDSElement containing the kid that is retrieved
       kid_index, //The index of the kid.
       &kid,     //The kid being accessed (depending on the kid's type) or NULL.
       &mcid_info,//The kid's information object or NULL.
-      (void**)&marked_content,     //Pointer to the kid or NULL.
+      NULL, //(void**)&marked_content,     //Pointer to the kid or NULL.
       NULL);    //The CosObj of the page containing the kid or NULL
-
+    
     // calls callback that performs the check or the fix
-    if (callback(perform_fix, element, kid_type, kid, mcid_info, marked_content))
+    if (callback(perform_fix, element, kid_type, kid_index, kid, mcid_info/*, marked_content*/))
       return true;
 
     if (kid_type == ASAtomFromString("StructElem")) {
@@ -102,7 +105,7 @@ bool DoStructureTreeRoot(bool perform_fix, ProcessStructureElementFunction callb
     PDSElement elem;
     for (ASInt32 i = 0; i < num; i++) {
       PDSTreeRootGetKid(pds_tree_root, i, &elem);
-      if (callback(perform_fix, CosNewNull(), ASAtomFromString("StructElem"), elem, PDSMCInfo(), NULL))
+      if (callback(perform_fix, CosNewNull(), ASAtomFromString("StructElem"), -1, elem, PDSMCInfo()/*, NULL*/))
         return true;
       to_ret = to_ret || DoStructureElement(pd_doc, elem, perform_fix, callback);
     }
@@ -301,41 +304,58 @@ PDPage PDDocAcquirePageFromCosObj(PDDoc pd_doc, CosObj page_obj) {
 //*****************************************************************************
 bool DoAllignSEWithMC(bool perform_fix) {
   ProcessStructureElementFunction sync_se_and_mc = [](bool perform_fix, PDSElement element,
-    ASAtom kid_type, CosObj kid, PDSMCInfo mcid_info, PDSMC marked_content) {
+    ASAtom kid_type, int kid_index, CosObj kid, PDSMCInfo mcid_info/*, PDSMC marked_content*/) {
 
     if (kid_type != ASAtomFromString("MC")) return false;
-    if (perform_fix) {
-      //need to acquire content to be able to change the MC container
-      PDEContent pde_content = NULL;
-      PDPage page = PDDocAcquirePageFromCosObj(AVDocGetPDDoc(AVAppGetActiveDoc()), mcid_info.page);
-      if (page != NULL)
-        pde_content = PDPageAcquirePDEContent(page, 0);
+
+    bool to_ret = false;
+    //need to acquire content to be able to change the MC container
+    PDEContent pde_content = NULL;
+    PDPage page = PDDocAcquirePageFromCosObj(AVDocGetPDDoc(AVAppGetActiveDoc()), mcid_info.page);
+    if (page != NULL)
+      pde_content = PDPageAcquirePDEContent(page, 0);
+    else
+      AVAlertNote("Can't find page for mcid");
+
+    PDSMC marked_content=NULL;
+    //CosObj kid2;
+    //Get the kid info
+    DURING
+      ASAtom kid_type_new = PDSElementGetKidWithMCInfo(element,  //The PDSElement containing the kid that is retrieved
+        kid_index, //The index of the kid.
+        NULL,     //The kid being accessed (depending on the kid's type) or NULL.
+        NULL,     //The kid's information object or NULL.
+        (void**)&marked_content,     //Pointer to the kid or NULL.
+        NULL);    //The CosObj of the page containing the kid or NULL
+    HANDLER
+      marked_content = NULL;
+    END_HANDLER
+
+    if (marked_content!=NULL)
+      if (perform_fix) {
+        PDEContainer container = PDSMCGetPDEContainer(marked_content);
+        ASAtom mc_tag = PDEContainerGetMCTag(container);
+        if (mc_tag != PDSElementGetType(element)) {
+          PDEContainerSetMCTag(container, PDSElementGetType(element));
+          PDPageSetPDEContent(page, 0);
+        }
+      }
       else {
-        AVAlertNote("Can't find page for mcid");
+        // just checking if the SE type matches the MC tag
+        ASAtom mc_tag = PDEContainerGetMCTag(PDSMCGetPDEContainer(marked_content));
+        //debug
+        //char buf[1024];
+        //sprintf(buf, "Problem. SE: %s --> MC: %s ", ASAtomGetString(PDSElementGetType(element)), ASAtomGetString(mc_tag));
+        if (mc_tag != PDSElementGetType(element))
+          to_ret = true; //stop processing the tree
       }
 
-      PDEContainer container = PDSMCGetPDEContainer(marked_content);
-      ASAtom mc_tag = PDEContainerGetMCTag(container);
-      if (mc_tag != PDSElementGetType(element)) {
-        PDEContainerSetMCTag(container, PDSElementGetType(element));
-        PDPageSetPDEContent(page, 0);
-      }
+    if (pde_content != NULL)
+      PDPageReleasePDEContent(page, 0);
+    if (page != NULL)
+      PDPageRelease(page);
 
-      if (pde_content != NULL)
-        PDPageReleasePDEContent(page, 0);
-      if (page != NULL)
-        PDPageRelease(page);
-    }
-    else {
-      // just checking if the SE type matches the MC tag
-      ASAtom mc_tag = PDEContainerGetMCTag(PDSMCGetPDEContainer(marked_content));
-      //debug
-      //char buf[1024];
-      //sprintf(buf, "Problem. SE: %s --> MC: %s ", ASAtomGetString(PDSElementGetType(element)), ASAtomGetString(mc_tag));
-      if (mc_tag != PDSElementGetType(element))
-        return true; //stop processing the tree
-    }
-    return false;
+    return to_ret;
   };
 
   return DoStructureTreeRoot(perform_fix, sync_se_and_mc);
@@ -391,7 +411,7 @@ bool DoEmptyRoleMap(bool perform_fix) {
 //*****************************************************************************
 bool DoUsedRoleMap(bool perform_fix) {
   ProcessStructureElementFunction roleMapUsage = [](bool perform_fix, PDSElement element,
-    ASAtom kid_type, CosObj kid, PDSMCInfo mcid_info, PDSMC marked_content)
+    ASAtom kid_type, int kid_index, CosObj kid, PDSMCInfo mcid_info/*, PDSMC marked_content*/)
   {
     if (kid_type != ASAtomFromString("StructElem"))
       return false;
@@ -442,7 +462,7 @@ bool DoIDTree(bool perform_fix) {
 //*****************************************************************************
 bool DoAttributes(bool perform_fix) {
   ProcessStructureElementFunction attributes = [](bool perform_fix, PDSElement element,
-    ASAtom kid_type, CosObj kid, PDSMCInfo mcid_info, PDSMC marked_content)
+    ASAtom kid_type, int kid_index, CosObj kid, PDSMCInfo mcid_info/*, PDSMC marked_content*/)
   {
     if (kid_type != ASAtomFromString("StructElem"))
       return false;
@@ -464,7 +484,7 @@ bool DoAttributes(bool perform_fix) {
 //*****************************************************************************
 bool DoTitleEntries(bool perform_fix) {
   ProcessStructureElementFunction titleEntries = [](bool perform_fix, PDSElement element,
-    ASAtom kid_type, CosObj kid, PDSMCInfo mcid_info, PDSMC marked_content)
+    ASAtom kid_type, int kid_index, CosObj kid, PDSMCInfo mcid_info/*, PDSMC marked_content*/)
   {
     if (kid_type != ASAtomFromString("StructElem"))
       return false;
@@ -488,7 +508,7 @@ bool DoTitleEntries(bool perform_fix) {
 //*****************************************************************************
 bool DoIDEntries(bool perform_fix) {
   ProcessStructureElementFunction ids = [](bool perform_fix, PDSElement element,
-    ASAtom kid_type, CosObj kid, PDSMCInfo mcid_info, PDSMC marked_content)
+    ASAtom kid_type, int kid_index, CosObj kid, PDSMCInfo mcid_info/*, PDSMC marked_content*/)
   {
     if (kid_type != ASAtomFromString("StructElem"))
       return false;
@@ -591,7 +611,7 @@ bool DoPageLayout(bool perform_fix) {
 //*****************************************************************************
 bool DoRedundantLangAttribute(bool perform_fix) {
   ProcessStructureElementFunction ids = [](bool perform_fix, PDSElement element,
-    ASAtom kid_type, PDSElement kid, PDSMCInfo mcid_info, PDSMC marked_content)
+    ASAtom kid_type, int kid_index, CosObj kid, PDSMCInfo mcid_info/*, PDSMC marked_content*/)
   {
     if (kid_type != ASAtomFromString("StructElem"))
       return false;
@@ -629,7 +649,7 @@ bool DoRedundantLangAttribute(bool perform_fix) {
 
 bool DoActualTextNullTerminator(bool perform_fix) {
   ProcessStructureElementFunction actuals = [](bool perform_fix, PDSElement element,
-    ASAtom kid_type, PDSElement kid, PDSMCInfo mcid_info, PDSMC marked_content)
+    ASAtom kid_type, int kid_index, CosObj kid, PDSMCInfo mcid_info/*, PDSMC marked_content*/)
   {
     bool ret_val = false;
 
@@ -672,7 +692,7 @@ bool DoActualTextNullTerminator(bool perform_fix) {
 
 bool DoAlternateTextNullTerminator(bool perform_fix) {
   ProcessStructureElementFunction alternates = [](bool perform_fix, PDSElement element,
-    ASAtom kid_type, PDSElement kid, PDSMCInfo mcid_info, PDSMC marked_content)
+    ASAtom kid_type, int kid_index, CosObj kid, PDSMCInfo mcid_info/*, PDSMC marked_content*/)
   {
     bool ret_val = false;
 

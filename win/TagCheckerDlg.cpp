@@ -122,6 +122,7 @@ void CTagCheckerDlg::OnBnClickedOk()
 
 BOOL CTagCheckerDlg::OnInitDialog()
 {
+
   CDialogEx::OnInitDialog();
   CheckDlgButton(IDC_CHECK_FOUND_1_1, DoAllignSEWithMC());
   CheckDlgButton(IDC_CHECK_FOUND_1_2, DoActualTextNullTerminator());

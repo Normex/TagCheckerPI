@@ -136,13 +136,14 @@
 		089C1669FE841209C02AAC07 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1010;
+				LastUpgradeCheck = 1420;
 			};
 			buildConfigurationList = 4FADC23708B4156C00ABE55E /* Build configuration list for PBXProject "TagCheckerPI" */;
 			compatibilityVersion = "Xcode 2.4";
 			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
+				English,
 				en,
 			);
 			mainGroup = 089C166AFE841209C02AAC07 /* _EmptySample */;
@@ -214,10 +215,12 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = BAE873A70A24E04600E97E2D /* Project_debug.xcconfig */;
 			buildSettings = {
+				ACROBAT_PLUGINS_FOLDER = "/Applications/Adobe Acrobat DC/Adobe Acrobat.app/Contents/Plugins";
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_WEAK = YES;
+				DSTROOT = "$(ACROBAT_PLUGINS_FOLDER)";
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_INPUT_FILETYPE = sourcecode.cpp.objcpp;
 				GCC_PREFIX_HEADER = "../Headers/SDK/PIHeaders++.pch";
@@ -229,6 +232,7 @@
 					../sources,
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/../Headers/SDK/Info.plist";
+				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.adobe.acrobat.sdk.TagCheckerPI;
 				PRODUCT_NAME = TagCheckerPI;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -241,6 +245,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = BAE873A90A24E04600E97E2D /* ProjectDefault.xcconfig */;
 			buildSettings = {
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
@@ -253,6 +258,7 @@
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
